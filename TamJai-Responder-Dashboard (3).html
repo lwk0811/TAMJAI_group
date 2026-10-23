@@ -1,0 +1,2256 @@
+<!doctype html>
+<html lang="zh-HK" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="譚仔國際 · 舆情回应看板 — Direction 1 · The Responder（课程概念原型）">
+<title>譚仔國際 · 舆情回应看板 — The Responder</title>
+<style>
+/* ============================================================
+   Tam Jai International · Social Response Board
+   Direction 1 — The Responder
+   Single-file prototype · design tokens → layout → components
+   ============================================================ */
+
+/* ---------- 1. Design tokens ---------- */
+:root{
+  color-scheme:light;
+  --font-ui:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",Roboto,sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+
+  --bg:#f3f4f6;
+  --bg-grad-1:rgba(255,107,53,.07);
+  --bg-grad-2:rgba(30,106,102,.08);
+  --surface:#ffffff;
+  --surface-2:#f8f9fb;
+  --surface-3:#eef0f4;
+  --border:#e3e6eb;
+  --border-strong:#cfd4dc;
+  --text:#111827;
+  --text-2:#4b5563;
+  --text-3:#8b93a1;
+
+  --brand:#ff6b35;
+  --brand-ink:#c2410c;
+  --brand-soft:#fff1ea;
+  --teal:#1e6a66;
+  --teal-soft:#e6f1f0;
+
+  --danger:#c62828;
+  --danger-2:#e53935;
+  --danger-soft:#fdecec;
+  --warning:#b45309;
+  --warning-2:#d97706;
+  --warning-soft:#fef5e5;
+  --success:#1f7a4d;
+  --success-2:#2e9e63;
+  --success-soft:#e9f6ee;
+  --info:#1d4ed8;
+  --info-soft:#eaf0fe;
+
+  --radius-xl:16px;
+  --radius-lg:12px;
+  --radius-md:10px;
+  --radius-sm:8px;
+  --shadow-xs:0 1px 2px rgba(16,24,40,.05);
+  --shadow-sm:0 1px 3px rgba(16,24,40,.07),0 1px 2px rgba(16,24,40,.04);
+  --shadow-md:0 6px 18px -6px rgba(16,24,40,.14),0 2px 6px -2px rgba(16,24,40,.06);
+  --shadow-lg:0 22px 48px -18px rgba(16,24,40,.28),0 8px 20px -12px rgba(16,24,40,.14);
+  --ring:0 0 0 3px rgba(255,107,53,.28);
+  --ring-teal:0 0 0 3px rgba(30,106,102,.22);
+  --ease:cubic-bezier(.2,.7,.3,1);
+  --top-offset:16px;
+}
+
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0e1116;
+  --bg-grad-1:rgba(255,107,53,.10);
+  --bg-grad-2:rgba(46,158,160,.10);
+  --surface:#161a21;
+  --surface-2:#1b2028;
+  --surface-3:#222834;
+  --border:#262d38;
+  --border-strong:#374151;
+  --text:#e9ecf1;
+  --text-2:#a7b0bd;
+  --text-3:#77808f;
+
+  --brand:#ff7f50;
+  --brand-ink:#ffa07a;
+  --brand-soft:#2c1a12;
+  --teal:#4fb3aa;
+  --teal-soft:#122b2a;
+
+  --danger:#f0776f;
+  --danger-2:#f28b83;
+  --danger-soft:#33191a;
+  --warning:#e0a63a;
+  --warning-2:#f0b654;
+  --warning-soft:#2e2412;
+  --success:#5fc98d;
+  --success-2:#6fd39a;
+  --success-soft:#12291d;
+  --info:#7ea2ff;
+  --info-soft:#16203a;
+
+  --shadow-xs:0 1px 2px rgba(0,0,0,.4);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.5);
+  --shadow-md:0 8px 20px -8px rgba(0,0,0,.7);
+  --shadow-lg:0 24px 50px -20px rgba(0,0,0,.85);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:24px;-webkit-text-size-adjust:100%}
+body{
+  margin:0;padding:0;min-height:100vh;
+  font-family:var(--font-ui);font-size:14px;line-height:1.6;
+  color:var(--text);
+  background:
+    radial-gradient(1100px 480px at 8% -8%,var(--bg-grad-1),transparent 62%),
+    radial-gradient(900px 420px at 96% -12%,var(--bg-grad-2),transparent 60%),
+    var(--bg);
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,p,ul,ol{margin:0}
+button{font-family:inherit}
+ul{list-style:none;padding:0}
+svg{flex:none}
+::selection{background:rgba(255,107,53,.22)}
+
+/* ---------- 2. Layout shell ---------- */
+.wrap{max-width:1480px;margin:0 auto;padding:20px max(18px,env(safe-area-inset-left)) 44px}
+
+/* ---------- 3. Masthead ---------- */
+.masthead{
+  display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:18px 28px;
+  padding:22px 26px;border-radius:var(--radius-xl);
+  background:linear-gradient(135deg,var(--surface) 0%,var(--surface) 55%,var(--surface-2) 100%);
+  border:1px solid var(--border);box-shadow:var(--shadow-sm);
+  position:relative;overflow:hidden;
+}
+.masthead::after{
+  content:"";position:absolute;inset-block:0;inset-inline-end:0;width:min(42%,520px);
+  background:radial-gradient(320px 180px at 100% 0%,rgba(255,107,53,.13),transparent 70%);
+  pointer-events:none;
+}
+.brand{display:flex;gap:16px;align-items:flex-start;min-width:0;position:relative;z-index:1}
+.brand-mark{
+  width:50px;height:50px;flex:none;border-radius:14px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#ff7a45,#e2481b);
+  color:#fff;font-weight:900;font-size:20px;letter-spacing:-.03em;
+  box-shadow:0 8px 18px -8px rgba(226,72,27,.75),inset 0 1px 0 rgba(255,255,255,.28);
+}
+.eyebrow{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--brand-ink);font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.eyebrow .sep{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.5}
+h1{
+  font-size:clamp(23px,2.6vw,31px);line-height:1.15;font-weight:800;letter-spacing:-.015em;
+  margin:6px 0 8px;text-wrap:balance;
+}
+.lede{color:var(--text-2);max-width:74ch;font-size:13.5px}
+.masthead-side{display:flex;flex-direction:column;align-items:flex-end;gap:12px;position:relative;z-index:1}
+.mh-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+
+/* status strip */
+.status-strip{
+  display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;
+  border:1px solid var(--border);background:var(--surface-2);
+  border-radius:999px;padding:5px 12px 5px 8px;font-family:var(--font-mono);font-size:11px;color:var(--text-2);
+}
+.status-item{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.status-divider{width:1px;height:14px;background:var(--border-strong);opacity:.7}
+.status-k{color:var(--text-3)}
+.status-v{font-weight:700;color:var(--text)}
+.pulse-dot{position:relative;width:8px;height:8px;border-radius:50%;background:var(--success-2);flex:none}
+.pulse-dot::after{
+  content:"";position:absolute;inset:-4px;border-radius:50%;
+  border:1.5px solid currentColor;color:var(--success-2);opacity:.55;
+  animation:pulse 2.4s var(--ease) infinite;
+}
+@keyframes pulse{0%{transform:scale(.6);opacity:.75}70%{transform:scale(1.5);opacity:0}100%{opacity:0}}
+.status-item.is-warn .pulse-dot{background:var(--success-2)}
+
+/* segmented controls */
+.seg{display:inline-flex;padding:3px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);gap:2px}
+.seg>button{
+  border:0;background:none;padding:5px 12px;border-radius:999px;cursor:pointer;
+  font-size:12px;font-weight:600;color:var(--text-2);transition:all .18s var(--ease);white-space:nowrap;
+}
+.seg>button:hover{color:var(--text)}
+.seg>button[aria-pressed="true"]{background:var(--text);color:var(--surface);box-shadow:var(--shadow-xs)}
+.seg>button:focus-visible{outline:none;box-shadow:var(--ring)}
+.icon-btn{
+  width:34px;height:34px;display:grid;place-items:center;border-radius:999px;cursor:pointer;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-2);transition:all .18s var(--ease);
+}
+.icon-btn:hover{color:var(--text);border-color:var(--border-strong)}
+
+/* ---------- 4. KPI ribbon ---------- */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:16px}
+.kpi{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:14px 16px;display:flex;flex-direction:column;gap:2px;
+  box-shadow:var(--shadow-xs);transition:box-shadow .22s var(--ease),transform .22s var(--ease),border-color .22s var(--ease);
+  position:relative;overflow:hidden;
+}
+.kpi::before{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:3px;background:var(--accent,var(--text-3));opacity:.85}
+.kpi:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);border-color:var(--border-strong)}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kpi-label{font-size:12px;font-weight:600;color:var(--text-2);letter-spacing:.01em}
+.kpi-icon{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--accent-soft,var(--surface-3));color:var(--accent,var(--text-2))}
+.kpi-num{font-size:29px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.15;color:var(--accent,var(--text))}
+.kpi-sub{font-size:11.5px;color:var(--text-3);min-height:1.4em;display:flex;align-items:center;gap:6px}
+.kpi-sub b{color:var(--text-2);font-weight:700}
+.kpi.a-brand{--accent:var(--brand-ink);--accent-soft:var(--brand-soft)}
+.kpi.a-danger{--accent:var(--danger);--accent-soft:var(--danger-soft)}
+.kpi.a-success{--accent:var(--success);--accent-soft:var(--success-soft)}
+.kpi.a-warning{--accent:var(--warning);--accent-soft:var(--warning-soft)}
+.kpi.a-teal{--accent:var(--teal);--accent-soft:var(--teal-soft)}
+
+/* SLA bar inside KPI */
+.kpi-sla{display:flex;align-items:center;gap:8px}
+.sla-seg{display:flex;height:6px;flex:1;border-radius:999px;overflow:hidden;background:var(--surface-3)}
+.sla-seg span{display:block;height:100%}
+.sla-seg .sg-red{background:var(--danger-2)}
+.sla-seg .sg-amber{background:var(--warning-2)}
+.sla-seg .sg-ok{background:var(--success-2)}
+
+/* ---------- 5. Main grid ---------- */
+.tabs{display:flex;align-items:center;gap:8px;margin:20px 0 16px;flex-wrap:wrap}
+.tab-btn{
+  display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:var(--radius-md);
+  border:1px solid var(--border);background:var(--surface);color:var(--text-2);
+  font-size:13px;font-weight:650;cursor:pointer;transition:all .18s var(--ease);white-space:nowrap;
+}
+.tab-btn:hover{border-color:var(--border-strong);color:var(--text)}
+.tab-btn[aria-selected="true"]{
+  background:var(--text);color:var(--surface);border-color:var(--text);
+  box-shadow:var(--shadow-sm);
+}
+.tab-btn:focus-visible{outline:none;box-shadow:var(--ring)}
+.tab-btn svg{opacity:.85}
+.badge{
+  min-width:19px;height:19px;padding:0 6px;border-radius:999px;background:var(--surface-3);color:var(--text-2);
+  font-size:11px;font-weight:800;line-height:19px;text-align:center;font-variant-numeric:tabular-nums;
+}
+.tab-btn[aria-selected="true"] .badge{background:rgba(255,255,255,.18);color:inherit}
+.badge.is-alert{background:var(--danger-2);color:#fff}
+.tab-btn[aria-selected="true"] .badge.is-alert{background:var(--danger-2);color:#fff}
+
+.main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}
+@media(max-width:1120px){.main{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- 6. Panels ---------- */
+.panel{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);
+  padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow-xs);
+}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.panel-title{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:750;color:var(--text);letter-spacing:-.005em}
+.panel-title .pt-icon{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--surface-3);color:var(--text-2)}
+.panel-meta{font-size:11.5px;color:var(--text-3);font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:8px}
+.panel-rule{height:1px;background:var(--border);margin:0 0 14px}
+
+/* ---------- 7. Source filter bar ---------- */
+.filter-shell{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.filter-bar{
+  display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin;
+  -webkit-overflow-scrolling:touch;
+}
+.filter-chip{
+  display:inline-flex;align-items:center;gap:7px;flex:none;
+  padding:7px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);
+  color:var(--text-2);font-size:12.5px;font-weight:650;cursor:pointer;transition:all .18s var(--ease);
+}
+.filter-chip:hover{border-color:var(--border-strong);color:var(--text);transform:translateY(-1px)}
+.filter-chip .dot{width:7px;height:7px;border-radius:50%;background:var(--sc,var(--text-3));flex:none;box-shadow:0 0 0 2px color-mix(in srgb,var(--sc) 22%,transparent)}
+.filter-chip .fc-count{
+  font-size:11px;font-weight:800;font-variant-numeric:tabular-nums;padding:0 6px;border-radius:999px;
+  background:var(--surface-3);color:var(--text-2);min-width:18px;text-align:center;
+}
+.filter-chip[aria-pressed="true"]{
+  background:var(--text);border-color:var(--text);color:var(--surface);
+}
+.filter-chip[aria-pressed="true"] .fc-count{background:rgba(255,255,255,.2);color:inherit}
+.filter-chip[aria-pressed="true"] .dot{box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+.filter-chip:focus-visible{outline:none;box-shadow:var(--ring)}
+.filter-chip.is-empty{opacity:.55}
+
+.filter-sub{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.filter-summary{font-size:12px;color:var(--text-3)}
+.filter-summary b{color:var(--text);font-weight:750}
+/* Priority legend */
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--text-3)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:8px;height:8px;border-radius:2px;display:block}
+.legend .l-red{background:var(--danger-2)}
+.legend .l-amber{background:var(--warning-2)}
+.legend .l-ok{background:var(--success-2)}
+
+/* ---------- 8. Mention cards ---------- */
+.stream{display:flex;flex-direction:column;gap:10px}
+.mention{
+  position:relative;border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:13px 15px 13px 17px;background:var(--surface);
+  transition:border-color .18s var(--ease),box-shadow .18s var(--ease),opacity .3s var(--ease),transform .3s var(--ease);
+}
+.mention::before{
+  content:"";position:absolute;inset-block:10px;inset-inline-start:0;width:3px;border-radius:0 3px 3px 0;
+  background:var(--sev,var(--border-strong));
+}
+.mention:hover{border-color:var(--border-strong);box-shadow:var(--shadow-sm)}
+.mention.is-highlight{border-color:var(--brand);box-shadow:0 0 0 3px rgba(255,107,53,.16),var(--shadow-md);animation:pop .5s var(--ease)}
+.mention.sla-breached{background:linear-gradient(90deg,color-mix(in srgb,var(--danger-soft) 70%,transparent),var(--surface) 55%)}
+@keyframes pop{from{transform:scale(.985)}to{transform:scale(1)}}
+
+.m-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.m-source{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:800;padding:3px 9px;border-radius:var(--radius-sm);
+  color:#fff;letter-spacing:.01em;background:var(--sc,#5d6577);
+}
+.m-source .src-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.9)}
+.m-time{font-family:var(--font-mono);font-size:11px;color:var(--text-3);font-variant-numeric:tabular-nums}
+.m-spacer{flex:1}
+.sent{
+  font-size:10.5px;font-weight:800;padding:2.5px 8px;border-radius:999px;letter-spacing:.02em;
+  display:inline-flex;align-items:center;gap:4px;
+}
+.sent.neg{background:var(--danger-soft);color:var(--danger)}
+.sent.pos{background:var(--success-soft);color:var(--success)}
+.sent.neu{background:var(--surface-3);color:var(--text-2)}
+.m-text{font-size:14px;line-height:1.62;color:var(--text);margin-bottom:9px;word-break:break-word}
+.m-tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{
+  font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;
+  background:var(--surface-3);color:var(--text-2);white-space:nowrap;
+}
+.tag.t-product{background:var(--brand-soft);color:var(--brand-ink)}
+.tag.t-price{background:var(--warning-soft);color:var(--warning)}
+.tag.t-service{background:var(--info-soft);color:var(--info)}
+.tag.t-digital{background:var(--teal-soft);color:var(--teal)}
+.tag.t-corporate{background:var(--surface-3);color:var(--text-2)}
+.tag.t-praise{background:var(--success-soft);color:var(--success)}
+
+/* ---------- 9. SLA countdown ---------- */
+.sla{
+  display:inline-flex;align-items:center;gap:6px;flex:none;
+  font-family:var(--font-mono);font-size:11.5px;font-weight:700;
+  padding:3px 9px;border-radius:var(--radius-sm);border:1px solid transparent;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em;
+}
+.sla svg{width:12px;height:12px}
+.sla .sla-label{font-family:var(--font-ui);font-size:10.5px;font-weight:750;opacity:.85;letter-spacing:0}
+.sla.c-urgent{background:var(--danger-soft);border-color:color-mix(in srgb,var(--danger-2) 45%,transparent);color:var(--danger)}
+.sla.c-moderate{background:var(--warning-soft);border-color:color-mix(in srgb,var(--warning-2) 45%,transparent);color:var(--warning)}
+.sla.c-ok{background:var(--success-soft);border-color:color-mix(in srgb,var(--success-2) 40%,transparent);color:var(--success)}
+.sla.c-none{background:var(--surface-3);color:var(--text-3);border-color:var(--border)}
+.sla.is-critical{animation:crit 2s var(--ease) infinite}
+@keyframes crit{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--danger-2) 45%,transparent)}50%{box-shadow:0 0 0 4px transparent}}
+.sla.is-breached{background:var(--danger-2);border-color:var(--danger-2);color:#fff}
+.sla.is-paused{opacity:.7;text-decoration:line-through}
+
+/* ---------- 10. Themes ---------- */
+.theme-row{display:grid;grid-template-columns:190px minmax(0,1fr) 96px;gap:12px;align-items:center;margin-bottom:12px}
+.theme-name{font-size:13px;font-weight:650;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.theme-track{height:26px;border-radius:8px;background:var(--surface-3);overflow:hidden;position:relative}
+.theme-fill{
+  height:100%;border-radius:8px;display:flex;align-items:center;padding:0 9px;
+  font-size:11px;font-weight:800;color:#fff;min-width:70px;
+  transition:width .6s var(--ease);
+}
+.theme-fill.high{background:linear-gradient(90deg,#c62828,#e53935)}
+.theme-fill.med{background:linear-gradient(90deg,#b45309,#d97706)}
+.theme-fill.low{background:linear-gradient(90deg,#1f7a4d,#2e9e63)}
+.theme-pct{font-family:var(--font-mono);font-size:12px;color:var(--text-2);text-align:right;font-variant-numeric:tabular-nums}
+.theme-pct b{color:var(--text);font-weight:800}
+.trend{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;align-items:end;height:180px;padding-top:6px}
+.trend-col{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}
+.trend-stack{flex:1;display:flex;flex-direction:column;justify-content:flex-end;width:100%;max-width:46px;border-radius:6px;overflow:hidden;background:var(--surface-3)}
+.trend-stack span{display:block;width:100%;transition:height .6s var(--ease)}
+.trend-stack .tv-pos{background:var(--success-2)}
+.trend-stack .tv-neu{background:var(--text-3);opacity:.55}
+.trend-stack .tv-neg{background:var(--danger-2)}
+.trend-day{font-size:11px;color:var(--text-3);font-variant-numeric:tabular-nums}
+.trend-key{display:flex;gap:14px;font-size:11.5px;color:var(--text-3);margin-top:10px;flex-wrap:wrap}
+.trend-key span{display:inline-flex;gap:6px;align-items:center}
+.trend-key i{width:9px;height:9px;border-radius:3px}
+
+/* ---------- 11. Strategy ---------- */
+.strategy-item{
+  border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 16px;margin-bottom:10px;
+  background:var(--surface-2);border-inline-start:3px solid var(--teal);
+}
+.strategy-item.urgent{border-inline-start-color:var(--danger-2);background:linear-gradient(90deg,var(--danger-soft),var(--surface-2) 60%)}
+.strategy-head{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.strategy-title{font-weight:750;font-size:13.5px;color:var(--text)}
+.pill{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;letter-spacing:.02em}
+.pill.p-urgent{background:var(--danger-2);color:#fff}
+.pill.p-normal{background:var(--teal-soft);color:var(--teal)}
+.strategy-desc{font-size:13px;color:var(--text-2);line-height:1.65}
+
+/* ---------- 12. Reply drafts + tone selector ---------- */
+.ctrl-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-lg);
+  background:var(--surface-2);margin-bottom:14px;
+}
+.ctrl-bar-label{display:flex;flex-direction:column;gap:1px}
+.ctrl-bar-label strong{font-size:12.5px;font-weight:750;color:var(--text)}
+.ctrl-bar-label span{font-size:11.5px;color:var(--text-3)}
+/* Tone selector — segmented pill w/ sliding thumb */
+.tone-selector{
+  position:relative;display:inline-flex;padding:4px;gap:4px;border-radius:999px;
+  background:var(--surface-3);border:1px solid var(--border);
+}
+.tone-btn{
+  position:relative;z-index:2;display:inline-flex;align-items:center;gap:7px;
+  border:0;background:none;padding:8px 16px;border-radius:999px;
+  font-size:12.5px;font-weight:700;color:var(--text-2);cursor:pointer;transition:color .2s var(--ease);white-space:nowrap;
+}
+.tone-btn:hover{color:var(--text)}
+.tone-btn[aria-checked="true"]{color:#fff}
+.tone-emoji{font-size:13px;transition:transform .2s var(--ease)}
+.tone-btn[aria-checked="true"] .tone-emoji{transform:scale(1.1)}
+.tone-thumb{
+  position:absolute;z-index:1;top:4px;bottom:4px;border-radius:999px;
+  transition:transform .3s var(--ease),width .3s var(--ease),background .3s var(--ease);
+  box-shadow:0 2px 8px -2px rgba(16,24,40,.35);
+}
+.tone-thumb.t-formal{background:linear-gradient(135deg,#1e6a66,#154c49)}
+.tone-thumb.t-friendly{background:linear-gradient(135deg,#ff7a45,#e2481b)}
+.tone-btn:focus-visible{outline:none;box-shadow:var(--ring)}
+.tone-hint{font-size:11.5px;color:var(--text-3);display:flex;align-items:center;gap:6px}
+
+.reply-card{
+  border:1px solid var(--border);border-radius:var(--radius-lg);padding:15px 16px;margin-bottom:12px;
+  background:var(--surface);transition:box-shadow .2s var(--ease),border-color .2s var(--ease);
+}
+.reply-card:hover{box-shadow:var(--shadow-sm)}
+.reply-card.is-draft{border-inline-start:3px solid var(--brand)}
+.reply-card.is-approved{border-inline-start:3px solid var(--success-2);opacity:.94}
+.reply-card.is-rejected{border-inline-start:3px solid var(--text-3);opacity:.75}
+.reply-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.reply-target{font-size:13px;font-weight:750;color:var(--text);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.reply-target .rt-src{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:6px;color:#fff;background:var(--sc,#5d6577)}
+.reply-target .rt-user{font-weight:500;color:var(--text-2);font-size:12px}
+.reply-head-side{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.reply-status{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;letter-spacing:.02em;white-space:nowrap}
+.reply-status.draft{background:var(--brand-soft);color:var(--brand-ink)}
+.reply-status.approved{background:var(--success-soft);color:var(--success)}
+.reply-status.rejected{background:var(--surface-3);color:var(--text-2)}
+.tone-pill{font-size:10.5px;font-weight:750;padding:3px 9px;border-radius:999px;border:1px solid var(--border);color:var(--text-2);white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.tone-pill.t-formal{background:var(--teal-soft);color:var(--teal);border-color:transparent}
+.tone-pill.t-friendly{background:var(--brand-soft);color:var(--brand-ink);border-color:transparent}
+
+.reply-context{
+  font-size:12.5px;color:var(--text-2);background:var(--surface-2);border:1px dashed var(--border-strong);
+  border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:10px;line-height:1.55;
+  display:flex;gap:8px;align-items:flex-start;
+}
+.reply-context .rc-ico{color:var(--text-3);margin-top:2px}
+.reply-context .rc-quote{flex:1;min-width:0}
+.reply-context .rc-quote q{quotes:"「" "」";font-style:normal}
+
+.reply-body-wrap{position:relative}
+.reply-body{
+  font-size:13.5px;line-height:1.72;color:var(--text);
+  background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:13px 15px;margin-bottom:10px;white-space:pre-wrap;word-break:break-word;
+  transition:opacity .18s var(--ease),filter .18s var(--ease),background .2s var(--ease);
+}
+.reply-body.is-switching{opacity:.35;filter:blur(1.5px)}
+.reply-card.is-approved .reply-body,.reply-card.is-rejected .reply-body{background:var(--surface-3);color:var(--text-2)}
+.reply-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.reply-note{font-size:11.5px;color:var(--text-3);margin-inline-start:auto}
+
+/* ---------- 13. Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:1px solid transparent;border-radius:var(--radius-sm);padding:7px 14px;
+  font-size:12.5px;font-weight:700;cursor:pointer;transition:all .16s var(--ease);white-space:nowrap;
+  line-height:1.35;
+}
+.btn:focus-visible{outline:none;box-shadow:var(--ring)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-approve{background:var(--success);color:#fff}
+.btn-approve:hover:not(:disabled){background:#196b42}
+.btn-reject{background:var(--surface);color:var(--danger);border-color:color-mix(in srgb,var(--danger-2) 40%,transparent)}
+.btn-reject:hover:not(:disabled){background:var(--danger-soft)}
+.btn-ghost{background:var(--surface);color:var(--text-2);border-color:var(--border)}
+.btn-ghost:hover:not(:disabled){color:var(--text);border-color:var(--border-strong);background:var(--surface-2)}
+.btn-primary{background:var(--text);color:var(--surface)}
+.btn-primary:hover:not(:disabled){opacity:.9}
+.btn-sm{padding:5px 11px;font-size:11.5px;border-radius:7px}
+.btn svg{width:13px;height:13px}
+
+/* ---------- 14. Sidebar ---------- */
+.side{display:flex;flex-direction:column;gap:16px;position:sticky;top:var(--top-offset);align-self:start}
+@media(max-width:1120px){.side{position:static}}
+.side-panel{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);
+  padding:16px 18px;box-shadow:var(--shadow-xs);
+}
+.side-title{font-size:13.5px;font-weight:750;color:var(--text);display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.side-sub{font-size:11.5px;color:var(--text-3);margin-bottom:12px;line-height:1.5}
+
+/* SLA watchlist */
+.watch-list{display:flex;flex-direction:column;gap:8px}
+.watch-item{
+  display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:var(--radius-md);
+  border:1px solid var(--border);background:var(--surface-2);cursor:pointer;
+  transition:all .16s var(--ease);text-align:start;width:100%;
+}
+.watch-item:hover{border-color:var(--border-strong);transform:translateX(2px);box-shadow:var(--shadow-xs)}
+.watch-item .wi-bar{width:3px;align-self:stretch;border-radius:3px;background:var(--sev,var(--border-strong));flex:none}
+.watch-item .wi-main{flex:1;min-width:0}
+.watch-item .wi-src{font-size:10.5px;font-weight:800;color:var(--text-3);letter-spacing:.02em;text-transform:uppercase}
+.watch-item .wi-text{font-size:12.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.watch-item .sla{font-size:11px;padding:2.5px 7px}
+
+/* PRD notes */
+.note-list li{
+  display:flex;gap:9px;align-items:flex-start;border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:9px 11px;margin-bottom:7px;background:var(--surface);transition:all .16s var(--ease);
+}
+.note-list li.active{border-color:var(--brand);background:var(--brand-soft)}
+.note-sec{
+  font-family:var(--font-mono);font-weight:800;color:var(--brand-ink);font-size:10.5px;
+  white-space:nowrap;padding-top:2px;letter-spacing:.03em;
+}
+.note-txt{flex:1;font-size:12.5px;line-height:1.55;color:var(--text-2)}
+.note-list li.active .note-txt{color:var(--text)}
+.note-show{
+  border:1px solid var(--border-strong);background:var(--surface);color:var(--text-2);border-radius:7px;
+  padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .16s var(--ease);
+}
+.note-show:hover{background:var(--text);color:var(--surface);border-color:var(--text)}
+
+/* Demo controls */
+.demo-wrap{border-top:1px dashed var(--border-strong);margin-top:13px;padding-top:12px}
+.demo-title{font-size:11px;font-weight:750;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:9px}
+.demo-btns{display:flex;flex-wrap:wrap;gap:6px}
+.demo-btn{
+  border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:5px 11px;
+  font-size:11.5px;font-weight:650;color:var(--text-2);cursor:pointer;transition:all .16s var(--ease);
+}
+.demo-btn:hover{border-color:var(--brand);color:var(--brand-ink);background:var(--brand-soft)}
+.demo-btn[aria-pressed="true"]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.flash{
+  margin-top:11px;font-size:12px;font-weight:650;color:var(--teal);min-height:2.8em;line-height:1.5;
+  padding:8px 11px;border-radius:var(--radius-sm);background:var(--teal-soft);
+  border:1px solid transparent;transition:all .2s var(--ease);
+}
+.flash:empty{background:transparent;border-color:transparent}
+.flash.is-error{color:var(--danger);background:var(--danger-soft)}
+
+/* ---------- 15. Footer ---------- */
+.foot{
+  margin-top:30px;padding-top:16px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  font-size:12px;color:var(--text-3);
+}
+.foot .foot-r{display:flex;gap:14px;flex-wrap:wrap}
+.foot .mono{font-family:var(--font-mono);font-size:11px}
+
+/* ---------- 16. Utilities ---------- */
+.empty{
+  text-align:center;padding:44px 16px;color:var(--text-3);font-size:13px;
+  border:1px dashed var(--border-strong);border-radius:var(--radius-lg);background:var(--surface-2);
+}
+.empty strong{display:block;color:var(--text-2);font-size:14px;margin-bottom:4px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;white-space:nowrap}
+[hidden]{display:none!important}
+
+/* ---------- 17. Scrollbars / motion ---------- */
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:6px;border:2px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:var(--text-3);background-clip:content-box}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+
+/* ---------- 18. Responsive ---------- */
+@media(max-width:1180px){
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:860px){
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .masthead{padding:18px}
+  .masthead-side{align-items:flex-start;width:100%}
+  .mh-controls{justify-content:flex-start}
+  .theme-row{grid-template-columns:120px minmax(0,1fr) 74px}
+  .panel{padding:15px 15px}
+  .ctrl-bar{flex-direction:column;align-items:stretch}
+  .tone-selector{justify-content:center}
+  .trend{height:150px;gap:6px}
+}
+@media(max-width:520px){
+  .wrap{padding:12px 12px 32px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .kpi-num{font-size:25px}
+  .m-source+.m-time{order:3}
+  .theme-row{grid-template-columns:96px minmax(0,1fr) 64px;gap:8px}
+  .theme-name{font-size:11.5px}
+  .status-strip{font-size:10.5px;gap:8px}
+  .tone-btn{padding:8px 12px;font-size:11.5px}
+  .reply-note{margin-inline-start:0}
+}
+@media print{
+  body{background:#fff}
+  .side,.tabs,.mh-controls,.reply-actions,.demo-wrap{display:none!important}
+  .main{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= MASTHEAD ================= -->
+  <header class="masthead">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">譚</div>
+      <div>
+        <div class="eyebrow">
+          <span data-i18n="eyebrow.week">Week 9</span><span class="sep"></span>
+          <span data-i18n="eyebrow.dir">Direction 1 — The Responder</span>
+        </div>
+        <h1>譚仔國際 · 舆情回应看板</h1>
+        <p class="lede" data-i18n="lede">实时监听、分析并回应全平台客户反馈；AI 生成品牌语调草稿，人工审批后发布。</p>
+      </div>
+    </div>
+
+    <div class="masthead-side">
+      <!-- AI status indicator -->
+      <div class="status-strip" role="status" aria-live="polite">
+        <span class="status-item">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          <span class="status-k">[AI Agent:</span><span class="status-v" data-i18n="status.ai">Online</span><span class="status-k">]</span>
+        </span>
+        <span class="status-divider" aria-hidden="true"></span>
+        <span class="status-item">
+          <span class="status-k">[Human-in-the-Loop:</span><span class="status-v" data-i18n="status.hitl">Active</span><span class="status-k">]</span>
+        </span>
+        <span class="status-divider" aria-hidden="true"></span>
+        <span class="status-item">
+          <span class="status-k" data-i18n="status.sla">SLA</span>
+          <span class="status-v" id="status-sla">24h / 4h</span>
+        </span>
+      </div>
+
+      <div class="mh-controls">
+        <div class="seg" role="group" aria-label="Language">
+          <button type="button" id="lang-zh" aria-pressed="true">中文</button>
+          <button type="button" id="lang-en" aria-pressed="false">EN</button>
+        </div>
+        <button type="button" class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode" title="Theme">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= KPI RIBBON ================= -->
+  <section class="kpis" aria-label="Key metrics">
+    <article class="kpi a-brand">
+      <div class="kpi-top">
+        <span class="kpi-label" data-i18n="kpi.total">今日提及</span>
+        <span class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
+      </div>
+      <div class="kpi-num" id="stat-total">0</div>
+      <div class="kpi-sub" id="stat-total-sub"></div>
+    </article>
+
+    <article class="kpi a-danger">
+      <div class="kpi-top">
+        <span class="kpi-label" data-i18n="kpi.neg">负面情绪</span>
+        <span class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></span>
+      </div>
+      <div class="kpi-num" id="stat-neg">0</div>
+      <div class="kpi-sub" id="stat-neg-sub"></div>
+    </article>
+
+    <article class="kpi a-success">
+      <div class="kpi-top">
+        <span class="kpi-label" data-i18n="kpi.pos">正面评价</span>
+        <span class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3z"/></svg></span>
+      </div>
+      <div class="kpi-num" id="stat-pos">0</div>
+      <div class="kpi-sub" id="stat-pos-sub"></div>
+    </article>
+
+    <article class="kpi a-warning">
+      <div class="kpi-top">
+        <span class="kpi-label" data-i18n="kpi.sla">SLA 倒计时（黄金 24 小时）</span>
+        <span class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+      </div>
+      <div class="kpi-num" id="stat-sla">0</div>
+      <div class="kpi-sla">
+        <div class="sla-seg" id="sla-seg" title="4h / 24h / responded">
+          <span class="sg-red" style="width:0"></span><span class="sg-amber" style="width:0"></span><span class="sg-ok" style="width:0"></span>
+        </div>
+      </div>
+    </article>
+
+    <article class="kpi a-teal">
+      <div class="kpi-top">
+        <span class="kpi-label" data-i18n="kpi.drafts">待审回复草稿</span>
+        <span class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></span>
+      </div>
+      <div class="kpi-num" id="stat-drafts">0</div>
+      <div class="kpi-sub" id="stat-drafts-sub"></div>
+    </article>
+  </section>
+
+  <!-- ================= TABS ================= -->
+  <nav class="tabs" role="tablist" aria-label="Dashboard sections">
+    <button class="tab-btn" role="tab" id="tab-listen" data-section="listen" aria-selected="true">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12h3l2-7 3 14 2-9 2 5h6"/></svg>
+      <span data-i18n="tab.listen">舆情监听</span><span class="badge" id="listen-badge">0</span>
+    </button>
+    <button class="tab-btn" role="tab" id="tab-themes" data-section="themes" aria-selected="false">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 20V10M9 20V4M15 20v-7M21 20V7"/></svg>
+      <span data-i18n="tab.themes">主题分析</span>
+    </button>
+    <button class="tab-btn" role="tab" id="tab-strategy" data-section="strategy" aria-selected="false">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      <span data-i18n="tab.strategy">沟通策略</span>
+    </button>
+    <button class="tab-btn" role="tab" id="tab-replies" data-section="replies" aria-selected="false">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span data-i18n="tab.replies">回复草稿</span><span class="badge" id="reply-badge">0</span>
+    </button>
+  </nav>
+
+  <!-- ================= MAIN GRID ================= -->
+  <div class="main">
+    <div class="board">
+
+      <!-- ---------- LISTEN ---------- -->
+      <section id="sec-listen" role="tabpanel" aria-labelledby="tab-listen">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span class="pt-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M5.6 5.6a9 9 0 000 12.8M18.4 5.6a9 9 0 010 12.8"/></svg></span>
+              <span data-i18n="listen.title">实时舆情流</span>
+            </div>
+            <div class="panel-meta">
+              <span class="pulse-dot" aria-hidden="true"></span>
+              <span data-i18n="listen.live">LIVE</span>
+              <span aria-hidden="true">·</span>
+              <span data-i18n="listen.sorted">按 SLA 紧迫度排序</span>
+            </div>
+          </div>
+
+          <!-- Multi-platform filter bar -->
+          <div class="filter-shell">
+            <div class="filter-bar" id="filter-bar" role="toolbar" aria-label="Platform filter"></div>
+            <div class="filter-sub">
+              <div class="filter-summary" id="filter-summary"></div>
+              <div class="legend">
+                <span><i class="l-red"></i><span data-i18n="legend.4h">4h 紧急 SLA</span></span>
+                <span><i class="l-amber"></i><span data-i18n="legend.24h">24h 标准 SLA</span></span>
+                <span><i class="l-ok"></i><span data-i18n="legend.done">已回应</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stream" id="mentions-container"></div>
+        </div>
+      </section>
+
+      <!-- ---------- THEMES ---------- -->
+      <section id="sec-themes" role="tabpanel" aria-labelledby="tab-themes" hidden>
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span class="pt-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20V10M9 20V4M15 20v-7M21 20V7"/></svg></span>
+              <span data-i18n="themes.title">重复出现的主题</span>
+            </div>
+            <div class="panel-meta" data-i18n="themes.meta">按提及量排序 · 近 24 小时</div>
+          </div>
+          <div id="themes-container"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span class="pt-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+              <span data-i18n="trend.title">情绪趋势 — 过去 7 天</span>
+            </div>
+          </div>
+          <div class="trend" id="sentiment-trend"></div>
+          <div class="trend-key" id="trend-key"></div>
+        </div>
+      </section>
+
+      <!-- ---------- STRATEGY ---------- -->
+      <section id="sec-strategy" role="tabpanel" aria-labelledby="tab-strategy" hidden>
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span class="pt-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 00-4 12.7V17h8v-2.3A7 7 0 0012 2z"/></svg></span>
+              <span data-i18n="strategy.title">AI 建议沟通策略</span>
+            </div>
+            <div class="panel-meta" data-i18n="strategy.meta">供公关团队审批参考</div>
+          </div>
+          <div id="strategy-container"></div>
+        </div>
+      </section>
+
+      <!-- ---------- REPLIES ---------- -->
+      <section id="sec-replies" role="tabpanel" aria-labelledby="tab-replies" hidden>
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span class="pt-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></span>
+              <span data-i18n="replies.title">回复草稿 — 需人工审批</span>
+            </div>
+            <div class="panel-meta" id="replies-meta"></div>
+          </div>
+
+          <!-- Brand tone selector -->
+          <div class="ctrl-bar">
+            <div class="ctrl-bar-label">
+              <strong data-i18n="tone.label">品牌语调</strong>
+              <span data-i18n="tone.sub">切换语调将即时重写所有待审草稿</span>
+            </div>
+            <div class="tone-selector" id="tone-selector" role="radiogroup" aria-label="Brand tone">
+              <span class="tone-thumb t-formal" id="tone-thumb" aria-hidden="true"></span>
+              <button class="tone-btn" type="button" role="radio" aria-checked="true" aria-live="off" data-tone="formal">
+                <span class="tone-emoji" aria-hidden="true">🏛️</span><span data-i18n="tone.formal">官方正規體</span>
+              </button>
+              <button class="tone-btn" type="button" role="radio" aria-checked="false" aria-live="off" data-tone="friendly">
+                <span class="tone-emoji" aria-hidden="true">🤝</span><span data-i18n="tone.friendly">譚仔親切體</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="replies-container"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ---------- SIDEBAR ---------- -->
+    <aside class="side">
+      <div class="side-panel">
+        <div class="side-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span data-i18n="watch.title">SLA 紧迫队列</span>
+        </div>
+        <p class="side-sub" data-i18n="watch.sub">按 24 小时黄金响应理论排序，点击跳转并定位。</p>
+        <div class="watch-list" id="watch-list"></div>
+      </div>
+
+      <div class="side-panel">
+        <div class="side-title" data-i18n="notes.title">PRD 对照</div>
+        <p class="side-sub" data-i18n="notes.sub">每条说明对应 PRD 的章节；点「看看」跳到相应状态。</p>
+        <ul class="note-list" id="note-list"></ul>
+        <div class="demo-wrap">
+          <div class="demo-title" data-i18n="demo.title">演示控制</div>
+          <div class="demo-btns" id="demo-btns"></div>
+          <div class="flash" role="status" aria-live="polite" id="flash-msg"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="foot">
+    <span data-i18n="foot.note">譚仔國際舆情回应系统 · Direction 1 — The Responder · 课程概念原型（非官方）</span>
+    <span class="foot-r mono">
+      <span data-i18n="foot.tone">语调</span>: <span id="foot-tone">—</span>
+      <span data-i18n="foot.clock">本地时间</span>: <span id="foot-clock">--:--</span>
+    </span>
+  </footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* ============================================================
+   PART 1 · CONSTANTS
+   ============================================================ */
+const SNAPSHOT_KEY = 'tamjai-responder.snapshot.v1';
+const PREF_KEY     = 'tamjai-responder.prefs.v1';
+const SLA_URGENT_H = 4;    // high-risk / urgent negative mentions
+const SLA_STD_H    = 24;   // moderate mentions
+
+const SOURCES = [
+  { id:'openrice', label:{ zh:'OpenRice', en:'OpenRice' }, color:'#ff6b35' },
+  { id:'red',      label:{ zh:'小紅書 RED', en:'RED' },     color:'#ff2442' },
+  { id:'weibo',    label:{ zh:'微博 Weibo', en:'Weibo' },   color:'#e6162d' },
+  { id:'lihkg',    label:{ zh:'LIHKG', en:'LIHKG' },        color:'#5b7fdb' },
+  { id:'wechat',   label:{ zh:'微信 WeChat', en:'WeChat' }, color:'#07a854' },
+  { id:'linkedin', label:{ zh:'LinkedIn', en:'LinkedIn' },  color:'#0a66c2' },
+  { id:'news',     label:{ zh:'新聞報道', en:'News' },      color:'#64748b' }
+];
+const SOURCE_MAP = Object.fromEntries(SOURCES.map(s => [s.id, s]));
+
+/* ============================================================
+   PART 2 · I18N STRINGS
+   ============================================================ */
+const I18N = {
+  zh: {
+    'eyebrow.week':'Week 9', 'eyebrow.dir':'Direction 1 — The Responder',
+    'lede':'实时监听、分析并回应全平台客户反馈；AI 生成品牌语调草稿，人工审批后发布。',
+    'status.ai':'Online', 'status.hitl':'Active', 'status.sla':'SLA',
+    'kpi.total':'今日提及', 'kpi.neg':'负面情绪', 'kpi.pos':'正面评价',
+    'kpi.sla':'SLA 倒计时（黄金 24 小时）', 'kpi.drafts':'待审回复草稿',
+    'tab.listen':'舆情监听', 'tab.themes':'主题分析', 'tab.strategy':'沟通策略', 'tab.replies':'回复草稿',
+    'listen.title':'实时舆情流', 'listen.live':'LIVE', 'listen.sorted':'按 SLA 紧迫度排序',
+    'legend.4h':'4h 紧急 SLA', 'legend.24h':'24h 标准 SLA', 'legend.done':'已回应',
+    'themes.title':'重复出现的主题', 'themes.meta':'按提及量排序 · 近 24 小时',
+    'trend.title':'情绪趋势 — 过去 7 天',
+    'strategy.title':'AI 建议沟通策略', 'strategy.meta':'供公关团队审批参考',
+    'replies.title':'回复草稿 — 需人工审批',
+    'tone.label':'品牌语调', 'tone.sub':'切换语调将即时重写所有待审草稿',
+    'tone.formal':'官方正規體', 'tone.friendly':'譚仔親切體',
+    'watch.title':'SLA 紧迫队列', 'watch.sub':'按 24 小时黄金响应理论排序，点击跳转并定位。',
+    'notes.title':'PRD 对照', 'notes.sub':'每条说明对应 PRD 的章节；点「看看」跳到相应状态。',
+    'demo.title':'演示控制', 'demo.reset':'重置',
+    'foot.note':'譚仔國際舆情回应系统 · Direction 1 — The Responder · 课程概念原型（非官方）',
+    'foot.tone':'语调', 'foot.clock':'本地时间',
+    'filter.all':'全部來源', 'filter.allSub':'All Sources',
+    'filter.summary':(shown,total,src) => `顯示 <b>${shown}</b> / ${total} 條 · 來源：<b>${src}</b>`,
+    'filter.none':'此來源目前沒有提及。',
+    'empty.title':'沒有匹配的評論', 'empty.sub':'嘗試切換其他平台來源。',
+    'sla.urgent':'4h SLA', 'sla.standard':'24h SLA', 'sla.done':'已回應', 'sla.paused':'已暫停',
+    'sla.breached':'已逾時', 'sla.remaining':'剩餘', 'sla.overdue':'逾時',
+    'sent.negative':'負面', 'sent.positive':'正面', 'sent.neutral':'中性',
+    'reply.approve':'批准', 'reply.reject':'拒絕', 'reply.edit':'編輯', 'reply.resend':'重新審閱',
+    'reply.draft':'草稿', 'reply.approved':'已批准', 'reply.rejected':'已拒絕',
+    'reply.toneSlot':'語調：', 'reply.aiNote':'AI 草稿 · 需人工確認後發布',
+    'reply.editHint':'點擊正文即可直接修改，修改會即時保存。',
+    'reply.noDraftsTitle':'尚無待審草稿', 'reply.noDraftsSub':'所有草稿均已完成審批。',
+    'reply.ctxLabel':'原文',
+    'show':'看看',
+    'kpi.totalSub':(n,srcs) => `${n} 條負面 · ${srcs} 個來源`,
+    'kpi.negSub':(n) => `高風險 <b>${n}</b> 宗`,
+    'kpi.posSub':(n) => `正面聲量佔比 <b>${n}%</b>`,
+    'kpi.slaSub':(a,b) => `<b>${a}</b> 宗 4h · <b>${b}</b> 宗 24h`,
+    'kpi.draftsSub':(n) => `${n} 條已批准 · ${n} 條已拒絕`,
+    'replies.meta':(p,a,r) => `待審 ${p} · 已批 ${a} · 已拒 ${r}`,
+    'trend.pos':'正面', 'trend.neu':'中性', 'trend.neg':'負面',
+    'strategy.urgent':'緊急', 'strategy.normal':'常規'
+  },
+  en: {
+    'eyebrow.week':'Week 9', 'eyebrow.dir':'Direction 1 — The Responder',
+    'lede':'Listen, analyse and respond across every platform. AI drafts in brand voice — humans approve before publishing.',
+    'status.ai':'Online', 'status.hitl':'Active', 'status.sla':'SLA',
+    'kpi.total':'Mentions today', 'kpi.neg':'Negative', 'kpi.pos':'Positive',
+    'kpi.sla':'SLA countdown (golden 24h)', 'kpi.drafts':'Drafts awaiting review',
+    'tab.listen':'Listening', 'tab.themes':'Themes', 'tab.strategy':'Strategy', 'tab.replies':'Drafts',
+    'listen.title':'Live mention stream', 'listen.live':'LIVE', 'listen.sorted':'sorted by SLA urgency',
+    'legend.4h':'4h urgent SLA', 'legend.24h':'24h standard SLA', 'legend.done':'Responded',
+    'themes.title':'Recurring themes', 'themes.meta':'Ranked by volume · last 24h',
+    'trend.title':'Sentiment trend — past 7 days',
+    'strategy.title':'AI-proposed communication strategy', 'strategy.meta':'For PR team review',
+    'replies.title':'Reply drafts — awaiting human approval',
+    'tone.label':'Brand tone', 'tone.sub':'Switching tone instantly rewrites every pending draft',
+    'tone.formal':'Official & Formal', 'tone.friendly':'TamJai Friendly',
+    'watch.title':'SLA urgency queue', 'watch.sub':'Ranked by the 24-hour golden response theory. Click to jump.',
+    'notes.title':'PRD notes', 'notes.sub':'Each note maps to a PRD section. Click "Show" to jump.',
+    'demo.title':'Demo controls', 'demo.reset':'Reset',
+    'foot.note':'Tam Jai International Social Response System · Direction 1 — The Responder · Course concept prototype (unofficial)',
+    'foot.tone':'Tone', 'foot.clock':'Local time',
+    'filter.all':'All Sources', 'filter.allSub':'全部來源',
+    'filter.summary':(shown,total,src) => `Showing <b>${shown}</b> of ${total} · Source: <b>${src}</b>`,
+    'filter.none':'No mentions from this source yet.',
+    'empty.title':'No matching mentions', 'empty.sub':'Try another platform source.',
+    'sla.urgent':'4h SLA', 'sla.standard':'24h SLA', 'sla.done':'Responded', 'sla.paused':'Paused',
+    'sla.breached':'Breached', 'sla.remaining':'left', 'sla.overdue':'overdue',
+    'sent.negative':'Negative', 'sent.positive':'Positive', 'sent.neutral':'Neutral',
+    'reply.approve':'Approve', 'reply.reject':'Reject', 'reply.edit':'Edit', 'reply.resend':'Re-review',
+    'reply.draft':'Draft', 'reply.approved':'Approved', 'reply.rejected':'Rejected',
+    'reply.toneSlot':'Tone: ', 'reply.aiNote':'AI draft · requires human sign-off',
+    'reply.editHint':'Click the text to edit inline — changes save live.',
+    'reply.noDraftsTitle':'No drafts pending', 'reply.noDraftsSub':'Every draft has been reviewed.',
+    'reply.ctxLabel':'Source',
+    'show':'Show',
+    'kpi.totalSub':(n,srcs) => `${n} negative · ${srcs} sources`,
+    'kpi.negSub':(n) => `High-risk <b>${n}</b>`,
+    'kpi.posSub':(n) => `Positive share <b>${n}%</b>`,
+    'kpi.slaSub':(a,b) => `<b>${a}</b> at 4h · <b>${b}</b> at 24h`,
+    'kpi.draftsSub':(n) => `—`,
+    'replies.meta':(p,a,r) => `Pending ${p} · Approved ${a} · Rejected ${r}`,
+    'trend.pos':'Positive', 'trend.neu':'Neutral', 'trend.neg':'Negative',
+    'strategy.urgent':'URGENT', 'strategy.normal':'ROUTINE'
+  }
+};
+
+/* ============================================================
+   PART 3 · CONTENT DATA (bilingual, single source of truth)
+   ============================================================ */
+const PRIORITY_RANK = { high:0, medium:1, low:2 };
+
+const MENTION_SEED = [
+  {
+    id:'m1', source:'openrice', time:'14:32', ageMin:78, sentiment:'negative', priority:'high',
+    themes:{ zh:['湯底味道','服務速度','品質下降'], en:['Soup Quality','Service Speed','Declining Standards'] },
+    text:{
+      zh:'今日去咗金鐘譚仔食雲吞麵，湯底真係好淡，以前成個鯨嘅而家變咗如水。服務員態度又慢，等咗二十幾分鐘先至有人理我。失望！',
+      en:'Went to Tam Jai at Admiralty today. The wonton soup base is far too light — used to be rich, now it tastes like water. Service was slow too, waited over 20 minutes before anyone attended to me. Disappointed!'
+    },
+    author:{ zh:'DavidC_Food', en:'DavidC_Food' },
+    replyTarget:{ zh:'OpenRice 頁面回覆', en:'Review page reply' }
+  },
+  {
+    id:'m2', source:'red', time:'13:15', ageMin:25, sentiment:'positive', priority:'low',
+    themes:{ zh:['產品味道','推薦'], en:['Product Taste','Recommendation'] },
+    text:{
+      zh:'譚仔嘅四川麻辣骨片麵真係好好食！！辣度剛剛好，骨頭湯底超濃郁～每次去香港都要食！🌶️🍜 #譚仔 #香港美食 #雲吞麵',
+      en:'Tam Jai\'s Sichuan spicy bone-noodle is SO good!! Spice level is spot on and the bone broth is super rich~ I have to eat it every time I visit HK! 🌶️🍜 #TamJai #HKFood'
+    },
+    author:{ zh:'Yuki吃貨日記', en:'Yuki_Eats' },
+    replyTarget:null
+  },
+  {
+    id:'m3', source:'lihkg', time:'12:48', ageMin:210, sentiment:'negative', priority:'high',
+    themes:{ zh:['價格調整','份量變化','品質擔憂'], en:['Price Increase','Portion Size','Quality Concerns'] },
+    text:{
+      zh:'有冇人發現譚仔近期加價好多？由細到大大概貴咗三成。同時份量似乎減少咗。係咪質素都跟唔上？',
+      en:'Has anyone noticed Tam Jai quietly raised prices a lot? Looks about 30% dearer than when I was a kid — and portions seem smaller. Is quality slipping too?'
+    },
+    author:{ zh:'@CookMaster', en:'@CookMaster' },
+    replyTarget:{ zh:'LIHKG 版主帖文追蹤', en:'Forum thread follow-up' }
+  },
+  {
+    id:'m4', source:'weibo', time:'11:20', ageMin:132, sentiment:'neutral', priority:'low',
+    themes:{ zh:['企業發展','業績增長'], en:['Corporate Growth','Financial Performance'] },
+    text:{
+      zh:'譚仔國際最新季度業績顯示營收增長12%，新開分店擴展東南亞市場。作為連鎖中餐品牌，譚仔在年輕消費者中的認知度持續提升。',
+      en:'Tam Jai International reports 12% revenue growth for the latest quarter, with new outlets expanding into Southeast Asia. Brand recognition among younger consumers keeps rising.'
+    },
+    author:{ zh:'@財經觀察', en:'@MarketWatcher' },
+    replyTarget:null
+  },
+  {
+    id:'m5', source:'wechat', time:'10:05', ageMin:207, sentiment:'positive', priority:'low',
+    themes:{ zh:['數碼化體驗','便利性'], en:['Digital Experience','Convenience'] },
+    text:{
+      zh:'譚仔小程序今日更新咗，新增線上點餐功能，可以提前落單到店取，呢個設計幾方便，打工仔中午省返好多時間。',
+      en:'Tam Jai\'s mini-program updated today with online ordering — order ahead and pick up in store. Really handy; saves me a lot of time at lunch.'
+    },
+    author:{ zh:'微信公眾號讀者', en:'WeChat follower' },
+    replyTarget:{ zh:'微信公眾號回覆', en:'Official Account reply' }
+  },
+  {
+    id:'m6', source:'linkedin', time:'09:30', ageMin:242, sentiment:'positive', priority:'low',
+    themes:{ zh:['品牌認可','國際擴張'], en:['Brand Recognition','International Expansion'] },
+    text:{
+      zh:'很榮幸分享：譚仔國際獲評為香港最受歡迎的快休閒餐飲連鎖之一。我們對正宗風味與優質食材的堅持，持續打動全球顧客。',
+      en:'Proud to share that Tam Jai International has been recognised as one of Hong Kong\'s top fast-casual dining chains. Our commitment to authentic flavours and quality ingredients continues to resonate with customers worldwide.'
+    },
+    author:{ zh:'企業專頁', en:'Company page' },
+    replyTarget:null
+  },
+  {
+    id:'m7', source:'openrice', time:'09:12', ageMin:80, sentiment:'negative', priority:'medium',
+    themes:{ zh:['產品品質','雲吞'], en:['Product Quality','Wonton'] },
+    text:{
+      zh:'連續三個月去譚仔都係同一個問題——雲吞皮太厚！食落去完全冇口感。點解一直改唔到？係咪廚房人手不足？',
+      en:'Third month running at Tam Jai and it is the same issue — the wonton wrapper is too thick. No bite at all. Why has this not been fixed? Are the kitchens short-staffed?'
+    },
+    author:{ zh:'OpenRice 會員喵', en:'OpenRice member Meow' },
+    replyTarget:{ zh:'OpenRice 頁面回覆', en:'Review page reply' }
+  },
+  {
+    id:'m8', source:'red', time:'08:45', ageMin:287, sentiment:'neutral', priority:'low',
+    themes:{ zh:['新品嘗試','口味反饋'], en:['New Product','Flavour Feedback'] },
+    text:{
+      zh:'譚仔嘅冬陰功麵試到新口味！不過覺得酸味重咗少少，可能個人喜好問題，整體都幾好食😋',
+      en:'Tried Tam Jai\'s new Tom Yum noodles! The sour note is a little strong for me — probably personal taste — but overall pretty tasty 😋'
+    },
+    author:{ zh:'小紅書用戶 Cici', en:'RED user Cici' },
+    replyTarget:{ zh:'小紅書私信回覆', en:'RED direct message reply' }
+  },
+  {
+    id:'m9', source:'news', time:'08:00', ageMin:332, sentiment:'neutral', priority:'low',
+    themes:{ zh:['國際擴張','泰國市場'], en:['International Expansion','Thailand Market'] },
+    text:{
+      zh:'譚仔國際宣布計劃於年底前在泰國開設5家新店，延續其在東南亞市場的擴張戰略。公司CEO表示將保持菜品原味並適應當地口味。',
+      en:'Tam Jai International plans to open five new stores in Thailand by year-end, continuing its Southeast Asia expansion. The CEO says the company will keep authentic flavours while adapting to local tastes.'
+    },
+    author:{ zh:'新聞輿情監測', en:'News monitoring' },
+    replyTarget:null
+  },
+  {
+    id:'m10', source:'weibo', time:'昨日', ageMin:1260, sentiment:'positive', priority:'low',
+    themes:{ zh:['服務體驗','正面情感'], en:['Service Experience','Positive Emotion'] },
+    text:{
+      zh:'譚仔嘅服務員今日對我微笑，仲送咗杯免費檸檬茶。原來細心服務真係可以令人開心成日🥤❤️',
+      en:'The Tam Jai server smiled at me today and gave me a free lemon tea. Small acts of care really can make your whole day 🥤❤️'
+    },
+    author:{ zh:'@小確幸', en:'@LittleJoy' },
+    replyTarget:null
+  },
+  {
+    id:'m11', source:'lihkg', time:'昨日', ageMin:1440, sentiment:'neutral', priority:'medium',
+    themes:{ zh:['外賣需求','競爭差距'], en:['Delivery Demand','Competitive Gap'] },
+    text:{
+      zh:'譚仔應該推出外賣服務啦，周圍嘅茶餐廳、麥當勞都有外賣，就係譚仔冇。搵外賣平台幫手得唔得？',
+      en:'Tam Jai should launch delivery. Every cha chaan teng and McDonald\'s does delivery — except Tam Jai. Could a delivery platform partner help?'
+    },
+    author:{ zh:'@HKFoodie', en:'@HKFoodie' },
+    replyTarget:{ zh:'LIHKG 跟帖回應', en:'Thread follow-up' }
+  },
+  {
+    id:'m12', source:'wechat', time:'昨日', ageMin:300, sentiment:'negative', priority:'medium',
+    themes:{ zh:['會員制度','客戶忠誠'], en:['Loyalty Program','Customer Retention'] },
+    text:{
+      zh:'譚仔嘅會員積分制度太差啦，積滿好多分先可以換嘢，而且選擇少得可憐。其他品牌都好過佢。',
+      en:'Tam Jai\'s loyalty programme is poor — you need a huge number of points to redeem anything, and the options are tiny. Other brands do far better.'
+    },
+    author:{ zh:'微信公眾號讀者', en:'WeChat follower' },
+    replyTarget:{ zh:'微信公眾號回覆', en:'Official Account reply' }
+  },
+  {
+    id:'m13', source:'lihkg', time:'15:02', ageMin:3, sentiment:'negative', priority:'high',
+    themes:{ zh:['食品安全','湯底味道'], en:['Food Safety','Soup Quality'] },
+    text:{
+      zh:'啱啱喺旺角譚仔食完，見到隔籬枱碗湯入面有隻蟲。同店員講，佢淨係話「幫你換一碗」就算。衛生咁差，以後都唔敢再嚟。',
+      en:'Just ate at the Mong Kok branch — the table next to us found an insect in the soup. The staff just said "we\'ll swap the bowl" and nothing more. Hygiene this poor, I won\'t be back.'
+    },
+    author:{ zh:'@HKFoodie', en:'@HKFoodie' },
+    replyTarget:{ zh:'LIHKG 跟帖回應（緊急）', en:'Thread follow-up (urgent)' }
+  },
+  {
+    id:'m14', source:'red', time:'13:46', ageMin:76, sentiment:'negative', priority:'high',
+    themes:{ zh:['服務態度','分店管理'], en:['Service Attitude','Branch Management'] },
+    text:{
+      zh:'尖沙咀分店嘅收銀姐姐態度好差，落單慢又擺臭面，同佢講嘢完全唔睬人。譚仔而家請人係咪唔培訓嘅？',
+      en:'The cashier at the Tsim Sha Tsui branch is really rude — slow to take orders, visibly annoyed, and ignored me completely. Does Tam Jai not train its staff any more?'
+    },
+    author:{ zh:'小紅書用戶 Mia', en:'RED user Mia' },
+    replyTarget:{ zh:'小紅書私信回覆', en:'RED direct message reply' }
+  },
+  {
+    id:'m15', source:'weibo', time:'12:10', ageMin:172, sentiment:'negative', priority:'medium',
+    themes:{ zh:['外賣品質','等候時間'], en:['Takeaway Quality','Wait Time'] },
+    text:{
+      zh:'譚仔外賣自取，等了45分鐘才拿到，回到家已經涼透，雲吞都黏成一坨。希望改善自取流程。',
+      en:'Ordered Tam Jai for takeaway pickup and waited 45 minutes. By the time I got home it was stone cold and the wontons had stuck together. Please improve the pickup flow.'
+    },
+    author:{ zh:'@打工人小陳', en:'@OfficeWorkerChen' },
+    replyTarget:{ zh:'微博評論回覆', en:'Weibo comment reply' }
+  },
+  {
+    id:'m16', source:'linkedin', time:'10:40', ageMin:262, sentiment:'neutral', priority:'low',
+    themes:{ zh:['ESG','僱主品牌'], en:['ESG','Employer Brand'] },
+    text:{
+      zh:'譚仔國際發布最新 ESG 報告，提及減少廚餘及員工培訓計劃，值得留意業界 ESG 進展。',
+      en:'Tam Jai International released its latest ESG report, covering food-waste reduction and staff training initiatives — worth watching for sector ESG progress.'
+    },
+    author:{ zh:'行業分析師', en:'Industry analyst' },
+    replyTarget:null
+  }
+];
+
+/* Reply drafts (per mention, per tone) */
+const REPLY_SEED = [
+  {
+    mentionId:'m1', source:'openrice', target:{ zh:'用戶 @DavidC_Food', en:'User @DavidC_Food' },
+    formal:{
+      zh:'尊敬的顧客：您好。非常感謝您蒞臨金鐘分店，並就湯底風味及服務效率提供寶貴意見。本公司對食品品質持有嚴格標準，是次體驗未能符合您的期望，我們謹此致以誠摯歉意。相關反饋已即時轉交該分店區域經理，並將就湯底調配標準及服務流程展開全面檢視，於三個工作日內完成改善跟進。如蒙您再次惠臨，我們將竭誠為您提供更佳體驗。敬頌　商祺。譚仔國際客戶服務部',
+      en:'Dear Customer,\n\nThank you for visiting our Admiralty branch and for taking the time to share your feedback on the soup base and service efficiency. Tam Jai International holds itself to strict food-quality standards, and we sincerely apologise that this experience did not meet your expectations. Your comments have been escalated directly to the branch\'s area manager; a full review of soup preparation standards and service workflow is now under way, with corrective follow-up due within three working days. Should you visit us again, we will be most glad to provide a better experience.\n\nYours sincerely,\nTam Jai International Customer Service'
+    },
+    friendly:{
+      zh:'Hello 阿David～多謝你特登嚟金鐘分店支持譚仔！🥹 聽到你話湯底淡咗、等咗二十幾分鐘先有人招呼，我哋個心真係惻住惻住——呢個絕對唔係我哋想你體驗到嘅譚仔呀。已經即刻話俾金鐘店經理知，廚房師傅今日就會重新校準湯底比例，前台亦會加強人手安排。你落次再嚟，可以試下我哋招牌麻辣骨片麵，湯底超濃郁㗎！記得同店員講聲係「睇咗回覆嚟」，我哋請你飲杯檸檬茶～ 多謝你嘅耐心同信任🙏',
+      en:'Hello David~ Thank you so much for coming to our Admiralty branch and supporting Tam Jai! 🥹 Hearing that the soup was too light and that you waited over twenty minutes really hit us — that is absolutely not the Tam Jai we want you to experience. We have already told the Admiralty store manager; the kitchen team will re-calibrate the soup base today and we are adding more front-of-house staff. Next time, do try our signature spicy bone noodles — the broth is super rich! Just let the staff know you "came from our reply" and we\'ll treat you to a lemon tea on us~ Thank you for your patience and trust 🙏'
+    }
+  },
+  {
+    mentionId:'m3', source:'lihkg', target:{ zh:'版主 @CookMaster 帖文', en:'Thread by @CookMaster' },
+    formal:{
+      zh:'各位討論區會員：就近日有關本品牌價格調整及份量變化的討論，本公司在此作出說明。過去兩年，原材料、租金及人力成本持續上升，本公司已盡力維持價格穩定，僅於必要時作出有限度調整。所有產品份量均按既定標準規格出品，並設有內部巡查機制。我們已準備詳盡的成本變動說明文件，並將於官方渠道公布，同時推出期間限定超值套餐以回饋顧客。感謝各位的關注與意見。譚仔國際企業傳訊部',
+      en:'To members of the forum,\n\nRegarding recent discussion of our pricing adjustments and portion sizes, Tam Jai International would like to clarify as follows. Over the past two years, raw material, rent and labour costs have risen continuously. We have worked hard to hold prices steady and have made only limited adjustments where necessary. All portions are prepared to established specifications and are subject to internal audit. We have prepared a detailed cost-change statement to be published through our official channels, together with a limited-period value set menu for our customers. Thank you for your attention and feedback.\n\nTam Jai International Corporate Communications'
+    },
+    friendly:{
+      zh:'各位 LIHKG 巴打絲打～知道你哋對加價同份量好有感覺，我哋唔會扮聽唔到 🙂 老實講，呢兩年原材料、租金、人工樣樣都貴咗，我哋都係一蚊一蚊咁頂住，先至硬住心加少少。份量方面我哋每次出品都有標準規格，不過你哋嘅聲音我哋已經收咗，區域經理會加強巡查。稍後我哋會喺官方渠道交代晒成本變化嘅細節，仲會推出一段時間嘅超值套餐，希望大家食得開心又食得抵。多謝你哋一直咁著緊譚仔，呢份「肉緊」我哋收到㗎！❤️🍜',
+      en:'Hey everyone~ We know you feel strongly about prices and portions, and we\'re not pretending otherwise 🙂 Honestly, raw materials, rent and wages have all gone up these two years and we held the line as long as we could before making a small adjustment. Every portion follows a set specification, but we hear you — our area managers will step up spot checks. We\'ll publish the full detail of the cost changes on our official channels shortly, together with a limited-time value set meal. Thank you for caring so much about Tam Jai — we genuinely feel that! ❤️🍜'
+    }
+  },
+  {
+    mentionId:'m12', source:'wechat', target:{ zh:'公眾號留言', en:'Official Account comment' },
+    formal:{
+      zh:'親愛的會員：感謝您就會員積分制度提出意見。本公司已注意到現行計劃在兌換門檻及獎賞選擇上的不足，並正進行全面優化。全新會員積分方案預計於下季度推出，將涵蓋更靈活的積分累積方式及更多元化的兌換選項。您的意見將納入產品設計參考，我們期望持續為您提供更完善的服務。譚仔國際會員服務中心',
+      en:'Dear Member,\n\nThank you for your feedback on our loyalty programme. We acknowledge that the current scheme\'s redemption thresholds and reward variety fall short, and a comprehensive review is under way. A new points programme is scheduled to launch next quarter, offering more flexible points accrual and a broader range of redemption options. Your comments will feed directly into product design, and we look forward to serving you better.\n\nTam Jai International Member Services'
+    },
+    friendly:{
+      zh:'多謝你咁直接同我哋講！🙏 會員制度積分門檻高、選擇又少，你嘅感受完全合理，我哋自己都覺得要檢討～好消息係：全新嘅會員積分計劃已經做緊，預計下個季度就推出，換嘅嘢會多好多，門檻亦會放寬。你嘅意見我哋已經記錄低，會直接交俾負責設計嘅同事睇。留意公眾號消息啦，有新計劃第一時間通知你～ 多謝你一直撐譚仔！❤️',
+      en:'Thank you for telling us so directly! 🙏 The high redemption threshold and limited options are a fair point — we agree it needs a rethink. Good news: a brand-new loyalty programme is in the works and should launch next quarter, with far more rewards and a lower threshold. Your comments have been logged and passed straight to the design team. Watch the official account — we\'ll tell you first. Thank you for sticking with Tam Jai! ❤️'
+    }
+  },
+  {
+    mentionId:'m7', source:'openrice', target:{ zh:'用戶「OpenRice 會員喵」', en:'User "OpenRice member Meow"' },
+    formal:{
+      zh:'尊敬的顧客：衷心感謝您長期支持本店，並提供具體而寶貴的意見。關於雲吞皮厚度不一的情況，本公司品質巡查部門已於近期檢查中記錄相關偏差，並已向各分店發出統一製作標準指令，要求嚴格執行。我們將於未來兩週進行覆核，確保出品一致。感謝您的耐心與關注。譚仔國際客戶服務部',
+      en:'Dear Customer,\n\nThank you for your long-standing support and for this specific, valuable feedback. Regarding inconsistent wonton wrapper thickness, our quality-audit team had already recorded deviations during recent inspections and has issued a uniform production standard to all branches for strict enforcement. We will re-audit over the coming two weeks to ensure consistency. Thank you for your patience.\n\nTam Jai International Customer Service'
+    },
+    friendly:{
+      zh:'連續三個月都嚟支持，真係好多謝你呀！🥟 雲吞皮太厚呢件事我哋唔會當係小事——已經通知晒各間分店統一標準，兩星期內會再巡查覆核。你講得啱，口感真係好重要。下次食到啱心水嘅，記得同我哋分享吓～ 多謝你一直咁包容同咁著緊，我哋會繼續改進💪',
+      en:'Three months in a row — thank you so much for your support! 🥟 We are not treating the thick wonton wrapper as a small thing: every branch has been told to follow one standard, and we\'ll re-audit within two weeks. You\'re right — texture matters. If a bowl hits the spot next time, let us know~ Thank you for your patience and honesty. We\'ll keep improving 💪'
+    }
+  },
+  {
+    mentionId:'m13', source:'lihkg', target:{ zh:'緊急 · 食安投訴（旺角分店）', en:'URGENT · Food-safety complaint (Mong Kok)' },
+    formal:{
+      zh:'【緊急聲明】就今日旺角分店有關食品衛生的投訴，譚仔國際高度重視，並已即時啟動內部調查程序。該分店已暫停所有湯底出品，進行全面清潔消毒及環境檢查，並配合食環署要求提交報告。我們對事件深表歉意，並將於查明原因後公布改善措施。同時，我們誠摯邀請該位顧客直接聯絡客戶服務熱線，以便我們提供適切跟進。食品安全是本公司的首要原則，我們絕不迴避責任。譚仔國際品質及安全部',
+      en:'[URGENT STATEMENT]\n\nTam Jai International takes today\'s hygiene complaint at the Mong Kok branch extremely seriously and has immediately launched an internal investigation. All soup-base production at the branch has been suspended pending full cleaning, disinfection and environmental inspection, and we are submitting a report in line with Food and Environmental Hygiene Department requirements. We sincerely apologise and will publish corrective measures once the cause is identified. We also invite the customer concerned to contact our service hotline directly so we can follow up appropriately. Food safety is our foremost principle — we will not evade responsibility.\n\nTam Jai International Quality & Safety'
+    },
+    friendly:{
+      zh:'非常唔好意思，呢件事我哋真係好緊張🙇‍♀️ 食品安全係譚仔嘅底線，見到你講嘅情況，我哋即刻叫停旺角分店嘅湯底出品，全店大清潔加環境檢查，亦會配合食環署提交報告。真心多謝你即刻講出嚟——你嘅舉報幫咗我哋好多。可以 pm 我哋提供落單時間同枱號嗎？我哋會親自跟進同賠償。呢件事我哋會交代到底，請繼續監察我哋🙏',
+      en:'We are so sorry — this is something we take extremely seriously 🙇‍♀️ Food safety is Tam Jai\'s bottom line. Hearing your account, we immediately suspended soup-base production at the Mong Kok branch for a full deep clean and environmental inspection, and will submit a report to the FEHD. Thank you for speaking up right away — it genuinely helps us. Could you PM us the order time and table number so we can follow up personally and make it right? We will see this through and ask you to keep holding us accountable 🙏'
+    }
+  },
+  {
+    mentionId:'m14', source:'red', target:{ zh:'用戶 Mia（私信）', en:'User Mia (DM)' },
+    formal:{
+      zh:'親愛的顧客：收到您關於尖沙咀分店服務態度的意見，本公司深感歉疚。我們已即時聯絡該分店主管了解情況，並將就收銀及前台服務流程、員工溝通培訓進行檢視。本公司一向視服務質素為核心價值，是次事件未能達到既定標準，我們會嚴肅處理。感謝您的寶貴意見，並期待為您提供更佳體驗。譚仔國際客戶服務部',
+      en:'Dear Customer,\n\nWe are sincerely sorry to receive your comments about service attitude at the Tsim Sha Tsui branch. We have contacted the branch supervisor immediately to establish the facts, and will review both the cashier/front-of-house workflow and staff communication training. Service quality is a core value for us; this incident fell below our standards and will be handled seriously. Thank you for your feedback and we look forward to providing a better experience.\n\nTam Jai International Customer Service'
+    },
+    friendly:{
+      zh:'Hello Mia～多謝你特意話俾我哋知！聽到收銀姐姐擺臭面同唔睬人，我自己都覺得嬲😤 已經即刻搵尖沙咀分店主管了解事件，會重新做前台服務同溝通培訓。譚仔最緊要係有溫度，唔應該俾你感受到咁冷淡。可以講多少少係邊個時段嗎？我哋會針對性跟進。真係多謝你，下次落嚟記得搵我哋傾兩句🙌',
+      en:'Hello Mia~ Thank you for letting us know! Hearing that the cashier was visibly annoyed and ignored you makes me angry too 😤 We\'ve already asked the TST branch supervisor to look into it and will re-run front-of-house and communication training. Tam Jai is all about warmth — you should never feel that coldness. Could you share roughly which time slot it was? We\'ll follow up specifically. Thank you so much — next time you visit, do say hi to us 🙌'
+    }
+  },
+  {
+    mentionId:'m15', source:'weibo', target:{ zh:'用戶 @打工人小陳', en:'User @OfficeWorkerChen' },
+    formal:{
+      zh:'您好：感謝您就自取等候時間反映意見。本公司已注意到午市高峰期間自取流程的瓶頸，並正檢視下單分流及備餐排程安排。我們將於短期內優化叫號系統，並就自取包裝保溫效果進行測試。是次體驗未能符合您的期望，我們深表歉意。感謝您的體諒與支持。譚仔國際客戶服務部',
+      en:'Hello,\n\nThank you for raising the takeaway pickup wait. We have identified bottlenecks in the pickup flow during the lunch peak and are reviewing order triage and kitchen scheduling. In the short term we will refine the number-calling system and test insulation performance for pickup packaging. We sincerely apologise that this experience fell short. Thank you for your understanding and support.\n\nTam Jai International Customer Service'
+    },
+    friendly:{
+      zh:'等多45分鐘仲要凍晒，真係好掃興呀😣 對唔住！午市高峰個自取流程真係有排要執——我哋已經開始檢視落單分流同備餐次序，短期內會改叫號系統，仲會測試保溫包裝，唔好再俾你食冷麵。多謝你咁好脾氣反映，落次落單可以留意叫號提醒，希望你下次食到熱辣辣嘅一碗🍜',
+      en:'Waiting 45 minutes and then getting cold food is such a letdown 😣 We\'re sorry! Our lunch-peak pickup flow really needs work — we\'ve started reviewing order triage and kitchen sequencing, are reworking the number-calling system shortly, and will test insulated packaging so you never get cold noodles again. Thank you for telling us so kindly. Next time, do watch the queue notification — we hope your next bowl comes out piping hot 🍜'
+    }
+  },
+  {
+    mentionId:'m5', source:'wechat', target:{ zh:'公眾號留言（正面）', en:'Official Account comment (positive)' },
+    formal:{
+      zh:'親愛的顧客：非常感謝您對本品牌數碼化服務的支持與肯定。線上點餐及到店自取功能旨在提升用餐效率；此外，會員亦可透過小程序累積積分並享用專屬優惠。如您對新功能有任何建議，歡迎隨時向我們反映。譚仔國際數碼服務部',
+      en:'Dear Customer,\n\nThank you for your support and kind words about our digital services. Online ordering and in-store pickup are designed to make your meals faster; members can also accrue points and enjoy exclusive offers through the mini-program. Should you have suggestions for new features, we would be glad to hear them.\n\nTam Jai International Digital Services'
+    },
+    friendly:{
+      zh:'多謝你支持呀！😍 個線上點餐就係想俾打工仔中午食快啲、鬆啲～除咗預點自取，記住用小程式儲積分同拎專屬優惠呀！你有咩新功能想加，隨時同我哋講，我哋真係會睇㗎！多謝你咁有心支持譚仔❤️',
+      en:'Thank you for the support! 😍 Online ordering is all about helping everyone eat faster and relax more at lunch~ Besides order-ahead pickup, remember to collect points and exclusive offers in the mini-program! If there\'s a feature you\'d like, tell us — we really do read them! Thank you for supporting Tam Jai ❤️'
+    }
+  }
+];
+
+/* Pending reply seed = first three by seed order (mirrors original prototype's 3 drafts) */
+const PENDING_IDS = ['m1','m3','m12','m7','m13','m14','m15','m5'];
+
+const THEMES = [
+  { zh:'湯底味道 / 產品品質', en:'Soup Quality / Product Standards', count:42, pct:33, sentiment:'mixed' },
+  { zh:'價格調整 / 價值感', en:'Price Increases / Value Perception', count:28, pct:22, sentiment:'negative' },
+  { zh:'服務速度 / 態度', en:'Service Speed / Attitude', count:21, pct:16.5, sentiment:'negative' },
+  { zh:'新品嘗試 / 口味反饋', en:'New Products / Flavour Feedback', count:15, pct:11.8, sentiment:'positive' },
+  { zh:'數碼化 / 小程序體驗', en:'Digital / Mini-program', count:10, pct:7.9, sentiment:'positive' },
+  { zh:'外賣需求 / 便利性', en:'Delivery Demand / Convenience', count:8, pct:6.3, sentiment:'neutral' },
+  { zh:'會員制度 / 忠誠度', en:'Loyalty Programme / Retention', count:3, pct:2.4, sentiment:'negative' }
+];
+
+const TREND = [
+  { zh:'週一', en:'Mon', pos:52, neu:24, neg:18 },
+  { zh:'週二', en:'Tue', pos:58, neu:20, neg:22 },
+  { zh:'週三', en:'Wed', pos:61, neu:18, neg:26 },
+  { zh:'週四', en:'Thu', pos:55, neu:22, neg:31 },
+  { zh:'週五', en:'Fri', pos:63, neu:19, neg:24 },
+  { zh:'週六', en:'Sat', pos:71, neu:16, neg:20 },
+  { zh:'今日', en:'Today', pos:68, neu:17, neg:34 }
+];
+
+const STRATEGIES = [
+  {
+    urgent:true,
+    title:{ zh:'【緊急】湯底品質問題集中爆發', en:'[URGENT] Soup-quality complaints surging' },
+    desc:{
+      zh:'過去 48 小時接獲 12 宗湯底味道淡化的投訴，集中於金鐘及旺角分店。建議：① 立即派區域經理巡店檢查湯底調配標準；② 於 OpenRice 及小紅書發布致歉與改進聲明；③ 以「湯底升級」內容覆蓋負面聲量，並於 4 小時內回覆高風險帖文。',
+      en:'Twelve complaints about a diluted soup base in the past 48 hours, concentrated at the Admiralty and Mong Kok branches. Action: ① send the area manager to inspect soup preparation standards immediately; ② publish an apology and improvement statement on OpenRice and RED; ③ counter with "soup upgrade" content and answer high-risk posts within the 4-hour SLA.'
+    }
+  },
+  {
+    urgent:true,
+    title:{ zh:'【緊急】食安投訴需要最高規格處理', en:'[URGENT] Food-safety complaint needs top-tier handling' },
+    desc:{
+      zh:'LIHKG 出現旺角分店湯內發現異物的帖文，屬最高風險類別。建議：立即啟動食安危機程序，暫停涉事產品線、配合食環署、由企業傳訊部統一發言，並私下聯絡當事人以提供補償。切勿在公開平台作技術性辯解。',
+      en:'A LIHKG post reports a foreign object in soup at the Mong Kok branch — highest-risk category. Action: activate the food-safety crisis protocol, suspend the affected product line, cooperate with the FEHD, issue a single corporate-communications statement, and contact the customer privately to arrange compensation. Do not argue technicalities publicly.'
+    }
+  },
+  {
+    urgent:false,
+    title:{ zh:'價格討論需要主動溝通', en:'Proactive communication on pricing' },
+    desc:{
+      zh:'LIHKG 及微博累計出現 23 篇關於加價的討論。建議：準備 FAQ 說明原材料成本變動原因，強調譚仔的品質承諾；考慮推出「超值套餐」以緩解價格敏感情緒，並由官方帳號統一回應避免各自表述。',
+      en:'Twenty-three posts across LIHKG and Weibo discuss price increases. Action: prepare an FAQ explaining raw-material cost changes and restating the quality commitment; consider a value set menu to ease price sensitivity; respond from the official account only to avoid contradictory messaging.'
+    }
+  },
+  {
+    urgent:false,
+    title:{ zh:'正面聲量最大化利用', en:'Maximise positive sentiment' },
+    desc:{
+      zh:'過去一週有 18 篇正面評價提及「濃湯底」「正宗味道」。建議：整理真實用戶反饋成 UGC 內容用於社交推廣；邀請小紅書 KOL 深度體驗；並優先回覆正面留言以提升互動率。',
+      en:'Eighteen positive mentions in the past week cite "rich broth" and "authentic taste". Action: curate these genuine reviews into UGC for social promotion, invite RED creators for in-depth visits, and prioritise replies to positive comments to lift engagement.'
+    }
+  },
+  {
+    urgent:false,
+    title:{ zh:'外賣需求納入產品規劃', en:'Capture delivery demand for the roadmap' },
+    desc:{
+      zh:'多個平台出現外賣及自取流程的呼聲，微博亦出現等候時間過長的投訴。本期雖不構建外賣系統，但應收集需求數據並優先優化自取流程，為後續路線圖提供依據。',
+      en:'Multiple platforms ask for delivery, and Weibo reports excessive pickup waits. This phase does not include a delivery system, but we should gather demand data and prioritise improving the pickup flow to inform the roadmap.'
+    }
+  }
+];
+
+const NOTES = [
+  { sec:'§1', zh:'組織與問題：譚仔國際缺乏統一的社交媒體監聽與快速回應機制，負面評論未能在關鍵時間窗內處理。', en:'Organisation & problem: Tam Jai lacks a unified social-listening and rapid-response mechanism; negative reviews go unaddressed inside the critical window.', target:{ section:'listen' } },
+  { sec:'§2', zh:'決策問題：① 面對集中投訴應如何優先處理？② 哪種回覆風格最符合譚仔品牌調性？', en:'Decision questions: ① how to prioritise simultaneous complaints? ② which response style best matches Tam Jai\'s brand voice?', target:{ section:'replies', focus:'tone' } },
+  { sec:'§3', zh:'數據來源：OpenRice、小紅書、微博、微信公眾號、LinkedIn、LIHKG、新聞輿情監測。', en:'Data sources: OpenRice, RED, Weibo, WeChat Official Accounts, LinkedIn, LIHKG, news monitoring.', target:{ section:'listen', focus:'filter' } },
+  { sec:'§4', zh:'前端：本管理員儀表板（即時監控、主題分析、策略建議、回覆審批）；後端：Python Flask API + PostgreSQL 儲存評論數據。', en:'Front-end: this admin dashboard (live monitoring, theme analysis, strategy, approval). Back-end: Python Flask API + PostgreSQL for comment storage.', target:{ section:'listen' } },
+  { sec:'§5', zh:'AI 組件：① 主題分類（BERT fine-tuned）② 情緒分析 ③ 品牌語調生成器（基於譚仔品牌指南的 Prompt Engineering，支援官方正規體／譚仔親切體）④ 回覆質量評分。', en:'AI components: ① topic classification (BERT fine-tuned) ② sentiment analysis ③ brand-voice generator (prompt engineering on Tam Jai brand guidelines — official/formal and friendly tones) ④ reply quality scoring.', target:{ section:'replies', focus:'tone' } },
+  { sec:'§6', zh:'工作流：數據採集 → AI 分類（主題＋情緒）→ 風險評估與 SLA 計時 → 策略建議 → 草稿生成 → 人工審批 → 發布。', en:'Workflow: collection → AI classification (topic + sentiment) → risk scoring & SLA timer → strategy → draft generation → human approval → publishing.', target:{ section:'listen', focus:'sla' } },
+  { sec:'§7', zh:'可行性：技術風險在於中文社交媒體文本解析準確度；法律合規須遵守個資私隱條例（PDPO），不儲存可識別身份的個人資料；明確不構建自動發布功能，所有回覆必須經人工確認。', en:'Feasibility: technical risk sits in Chinese social-media parsing accuracy. Legal compliance requires PDPO adherence — no personally identifiable data stored. Explicitly NOT building auto-publishing: every reply needs human confirmation.', target:{ section:'strategy' } }
+];
+
+const DEMO = [
+  { action:'new-mention', zh:'模擬新評論', en:'Simulate mention' },
+  { action:'refresh',     zh:'刷新數據',   en:'Refresh data' },
+  { action:'batch-approve', zh:'批量審批', en:'Batch approve' },
+  { action:'toggle-sentiment', zh:'切換情緒', en:'Toggle sentiment' },
+  { action:'jump-peak',   zh:'跳到高峰',   en:'Jump to peak' },
+  { action:'reset',       zh:'重置',       en:'Reset' }
+];
+
+const FLASH = {
+  'new-mention':{ zh:'已加入一條新評論（小紅書 · 負面 · 4h SLA）', en:'New mention added (RED · negative · 4h SLA)' },
+  'refresh':{ zh:'數據已刷新，新增 2 條評論（微博／小紅書）', en:'Data refreshed — 2 new mentions (Weibo / RED)' },
+  'batch-approve':{ zh:'已批量審批所有待審草稿', en:'All pending drafts batch-approved' },
+  'toggle-sentiment':{ zh:'已重新評估首條評論的情緒標籤', en:'Sentiment of the first mention re-scored' },
+  'jump-peak':{ zh:'已跳至負面聲量高峰（今日 14:00–15:00）', en:'Jumped to today\'s negative peak (14:00–15:00)' },
+  'reset':{ zh:'狀態已重置為初始演示數據', en:'State reset to the seeded demo data' }
+};
+
+/* ============================================================
+   PART 4 · TINY HELPERS
+   ============================================================ */
+const $  = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+const clone = v => JSON.parse(JSON.stringify(v));
+const pad2 = n => String(n).padStart(2, '0');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const L = obj => (obj && obj[state.lang]) || (obj && obj.zh) || '';
+
+/* ============================================================
+   PART 5 · STATE
+   ============================================================ */
+const state = {
+  lang: 'zh',
+  theme: 'light',
+  tone: 'formal',
+  section: 'listen',
+  source: 'all',
+  highlightId: null,
+  noteIndex: -1,
+  focusedReply: null,
+  flash: '',
+  mentions: [],
+  replies: [],
+  now: Date.now()
+};
+
+/* Persisted prefs (language / tone / theme) */
+function loadPrefs() {
+  try {
+    const p = JSON.parse(localStorage.getItem(PREF_KEY) || '{}');
+    if (p.lang === 'zh' || p.lang === 'en') state.lang = p.lang;
+    if (p.tone === 'formal' || p.tone === 'friendly') state.tone = p.tone;
+    if (p.theme === 'light' || p.theme === 'dark') state.theme = p.theme;
+  } catch (_) { /* storage unavailable — use defaults */ }
+}
+function savePrefs() {
+  try {
+    localStorage.setItem(PREF_KEY, JSON.stringify({ lang: state.lang, tone: state.tone, theme: state.theme }));
+  } catch (_) {}
+}
+
+/* ============================================================
+   PART 6 · SLA ENGINE
+   ============================================================ */
+function slaHours(m) {
+  if (m.priority === 'high') return SLA_URGENT_H;
+  if (m.priority === 'medium') return SLA_STD_H;
+  return null;                       // positive / neutral low-risk → no SLA pressure
+}
+function slaDeadline(m) { return m.createdAt + slaHours(m) * 3600 * 1000; }
+function slaRemaining(m) {
+  const h = slaHours(m);
+  if (!h) return null;
+  return slaDeadline(m) - state.now;
+}
+function slaState(m) {
+  // 'done' | 'breached' | 'urgent' | 'moderate' | 'none'
+  const h = slaHours(m);
+  if (!h) return 'none';
+  if (m.responded) return 'done';
+  const rem = slaRemaining(m);
+  if (rem <= 0) return 'breached';
+  return h === SLA_URGENT_H ? 'urgent' : 'moderate';
+}
+function fmtDuration(ms) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+}
+function slaPill(m) {
+  const st = slaState(m);
+  const rem = slaRemaining(m);
+  if (st === 'none') {
+    return `<span class="sla c-none" title="${state.lang === 'zh' ? '無 SLA 約束' : 'No SLA'}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14"/></svg>—</span>`;
+  }
+  if (st === 'done') {
+    return `<span class="sla c-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>${esc(txt('sla.done'))}</span>`;
+  }
+  const cls = st === 'breached' ? 'is-breached' : (st === 'urgent' ? 'c-urgent' : 'c-moderate');
+  const crit = st === 'urgent' && rem < 60 * 60 * 1000 ? 'is-critical' : '';
+  const label = txt(slaHours(m) === SLA_URGENT_H ? 'sla.urgent' : 'sla.standard');
+  const body = st === 'breached'
+    ? `${txt('sla.overdue')} ${fmtDuration(-rem)}`
+    : fmtDuration(rem);
+  const title = st === 'breached' ? txt('sla.breached') : `${label} · ${txt('sla.remaining')}`;
+  return `<span class="sla ${cls} ${crit}" data-sla-id="${m.id}" title="${esc(title)}" role="timer" aria-live="off">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    <span class="sla-label">${esc(label)}</span>${body}
+  </span>`;
+}
+
+/* ============================================================
+   PART 7 · I18N HELPER
+   ============================================================ */
+function txt(key, ...args) {
+  const dict = I18N[state.lang] || I18N.zh;
+  let v = dict[key];
+  if (v === undefined) v = I18N.zh[key];
+  if (typeof v === 'function') return v(...args);
+  return v === undefined ? key : v;
+}
+
+/* ============================================================
+   PART 8 · DATA INIT / SNAPSHOT
+   ============================================================ */
+function seedMentions() {
+  const base = Date.now();
+  return MENTION_SEED.map(m => {
+    const createdAt = base - (m.ageMin || 0) * 60 * 1000;
+    return {
+      id: m.id, source: m.source, time: m.time, text: clone(m.text),
+      themes: clone(m.themes), author: clone(m.author), replyTarget: clone(m.replyTarget),
+      sentiment: m.sentiment, priority: m.priority,
+      createdAt,
+      responded: false
+    };
+  });
+}
+function seedReplies() {
+  return REPLY_SEED.map((r, i) => ({
+    id: 'r' + (i + 1),
+    mentionId: r.mentionId,
+    source: r.source,
+    target: clone(r.target),
+    tone: state.tone,
+    body: { formal: clone(r.formal), friendly: clone(r.friendly) },
+    edited: false,
+    status: PENDING_IDS.includes(r.mentionId) ? 'draft' : 'queued'
+  }));
+}
+function resetState(notify) {
+  state.mentions = seedMentions();
+  state.replies  = seedReplies();
+  state.source = 'all';
+  state.highlightId = null;
+  state.noteIndex = -1;
+  state.focusedReply = null;
+  state.flash = notify ? txt('demo.reset') : '';
+}
+function saveSnapshot() {
+  try {
+    localStorage.setItem(SNAPSHOT_KEY, JSON.stringify({
+      v: 1,
+      mentions: state.mentions.map(m => ({ id: m.id, createdAt: m.createdAt, responded: m.responded, sentiment: m.sentiment, priority: m.priority })),
+      replies: state.replies.map(r => ({ id: r.id, status: r.status, tone: r.tone, edited: r.edited, body: r.edited ? r.body : null }))
+    }));
+  } catch (_) {}
+}
+function loadSnapshot() {
+  let snap;
+  try { snap = JSON.parse(localStorage.getItem(SNAPSHOT_KEY) || 'null'); } catch (_) { snap = null; }
+  resetState(false);
+  if (!snap || snap.v !== 1) return;
+
+  // Only restore status flags onto known seeds (keep demo stable & profile-safe)
+  const mMap = new Map(state.mentions.map(m => [m.id, m]));
+  (snap.mentions || []).forEach(sm => {
+    const m = mMap.get(sm.id);
+    if (!m) return;
+    if (typeof sm.responded === 'boolean') m.responded = sm.responded;
+    if (typeof sm.createdAt === 'number' && sm.createdAt < Date.now()) m.createdAt = sm.createdAt;
+  });
+  const rMap = new Map(state.replies.map(r => [r.id, r]));
+  (snap.replies || []).forEach(sr => {
+    const r = rMap.get(sr.id);
+    if (!r) return;
+    if (['draft', 'approved', 'rejected'].includes(sr.status)) r.status = sr.status;
+    if (sr.edited && sr.body && sr.body.formal && sr.body.friendly) { r.body = sr.body; r.edited = true; }
+  });
+}
+
+/* ============================================================
+   PART 9 · RENDER
+   ============================================================ */
+function render() {
+  renderChrome();
+  renderKpis();
+  renderFilterBar();
+  renderMentions();
+  renderThemes();
+  renderTrend();
+  renderStrategies();
+  renderReplies();
+  renderWatchlist();
+  renderNotes();
+  renderDemo();
+  renderBadges();
+  syncToneSelector(false);
+}
+
+function renderChrome() {
+  document.documentElement.setAttribute('data-theme', state.theme);
+  document.documentElement.lang = state.lang === 'zh' ? 'zh-HK' : 'en';
+  $$('[data-i18n]').forEach(el => { el.textContent = txt(el.dataset.i18n); });
+  $('#lang-zh').setAttribute('aria-pressed', String(state.lang === 'zh'));
+  $('#lang-en').setAttribute('aria-pressed', String(state.lang === 'en'));
+  $('#theme-toggle').setAttribute('aria-label', state.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  $('#foot-tone').textContent = txt(state.tone === 'formal' ? 'tone.formal' : 'tone.friendly');
+}
+
+function renderKpis() {
+  const ms = state.mentions;
+  const total = ms.length;
+  const neg = ms.filter(m => m.sentiment === 'negative').length;
+  const pos = ms.filter(m => m.sentiment === 'positive').length;
+  const highRisk = ms.filter(m => m.sentiment === 'negative' && m.priority === 'high' && !m.responded).length;
+  const srcCount = new Set(ms.map(m => m.source)).size;
+  const drafts = state.replies.filter(r => r.status === 'draft').length;
+  const approved = state.replies.filter(r => r.status === 'approved').length;
+  const rejected = state.replies.filter(r => r.status === 'rejected').length;
+
+  const openUrgent = ms.filter(m => slaState(m) === 'urgent').length;
+  const openStd    = ms.filter(m => slaState(m) === 'moderate').length;
+  const breached   = ms.filter(m => slaState(m) === 'breached').length;
+  const done       = ms.filter(m => slaState(m) === 'done').length;
+
+  $('#stat-total').textContent = total;
+  $('#stat-total-sub').innerHTML = txt('kpi.totalSub', neg, srcCount);
+  $('#stat-neg').textContent = neg;
+  $('#stat-neg-sub').innerHTML = txt('kpi.negSub', highRisk);
+  $('#stat-pos').textContent = pos;
+  $('#stat-pos-sub').innerHTML = txt('kpi.posSub', total ? Math.round(pos / total * 100) : 0);
+  $('#stat-sla').textContent = breached ? breached : openUrgent + openStd;
+  $('#stat-sla').style.color = breached ? 'var(--danger)' : (openUrgent ? 'var(--danger)' : 'var(--warning)');
+  $('#stat-sla').title = txt('kpi.slaSub', openUrgent, openStd);
+  const segTotal = Math.max(1, breached + openUrgent + openStd + done);
+  $('#sla-seg').innerHTML = `
+    <span class="sg-red" style="width:${(breached / segTotal * 100).toFixed(1)}%"></span>
+    <span class="sg-amber" style="width:${(openUrgent / segTotal * 100).toFixed(1)}%"></span>
+    <span class="sg-ok" style="width:${((openStd + done) / segTotal * 100).toFixed(1)}%"></span>`;
+  const draftsSub = state.lang === 'zh'
+    ? `${approved} 條已批准 · ${rejected} 條已拒絕`
+    : `${approved} approved · ${rejected} rejected`;
+  $('#stat-drafts').textContent = drafts;
+  $('#stat-drafts-sub').textContent = draftsSub;
+  $('#replies-meta').textContent = txt('replies.meta', drafts, approved, rejected);
+}
+
+/* ---------- Platform filter bar ---------- */
+function srcLabel(id) {
+  const s = SOURCE_MAP[id];
+  return s ? L(s.label) : id;
+}
+function srcColor(id) {
+  const s = SOURCE_MAP[id];
+  return s ? s.color : '#64748b';
+}
+function renderFilterBar() {
+  const bar = $('#filter-bar');
+  const counts = {};
+  state.mentions.forEach(m => { counts[m.source] = (counts[m.source] || 0) + 1; });
+  const total = state.mentions.length;
+
+  let html = `<button class="filter-chip" type="button" data-source="all" aria-pressed="${state.source === 'all'}" style="--sc:#111827">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <span>${esc(txt('filter.all'))}</span>
+      <span class="fc-count">${total}</span>
+    </button>`;
+
+  SOURCES.forEach(s => {
+    const c = counts[s.id] || 0;
+    html += `<button class="filter-chip ${c ? '' : 'is-empty'}" type="button" data-source="${s.id}"
+        aria-pressed="${state.source === s.id}" style="--sc:${s.color}">
+      <span class="dot" aria-hidden="true"></span>
+      <span>${esc(L(s.label))}</span>
+      <span class="fc-count">${c}</span>
+    </button>`;
+  });
+  bar.innerHTML = html;
+
+  const shown = state.source === 'all' ? total : state.mentions.filter(m => m.source === state.source).length;
+  const srcName = state.source === 'all' ? txt('filter.all') : srcLabel(state.source);
+  $('#filter-summary').innerHTML = state.source !== 'all' && shown === 0
+    ? esc(txt('filter.none'))
+    : txt('filter.summary', shown, total, esc(srcName));
+}
+
+/* ---------- Mention stream ---------- */
+function sortedMentions() {
+  // SLA urgency first (breached → urgent → moderate → none/done), then risk, then recency
+  const weight = { breached:0, urgent:1, moderate:2, done:3, none:4 };
+  return [...state.mentions].sort((a, b) => {
+    const wa = weight[slaState(a)], wb = weight[slaState(b)];
+    if (wa !== wb) return wa - wb;
+    const pa = PRIORITY_RANK[a.priority], pb = PRIORITY_RANK[b.priority];
+    if (pa !== pb) return pa - pb;
+    return b.createdAt - a.createdAt;
+  });
+}
+function visibleMentions() {
+  return sortedMentions().filter(m => state.source === 'all' || m.source === state.source);
+}
+function sentClass(s) { return s === 'negative' ? 'neg' : s === 'positive' ? 'pos' : 'neu'; }
+function sentLabel(s) { return txt('sent.' + (s === 'negative' ? 'negative' : s === 'positive' ? 'positive' : 'neutral')); }
+function sentMark(s) { return s === 'negative' ? '▼' : s === 'positive' ? '▲' : '■'; }
+
+function renderMentions() {
+  const box = $('#mentions-container');
+  const list = visibleMentions();
+  if (!list.length) {
+    box.innerHTML = `<div class="empty"><strong>${esc(txt('empty.title'))}</strong>${esc(txt('empty.sub'))}</div>`;
+    return;
+  }
+  box.innerHTML = list.map(m => {
+    const st = slaState(m);
+    const sev = st === 'breached' ? 'var(--danger-2)'
+      : st === 'urgent' ? 'var(--danger-2)'
+      : st === 'moderate' ? 'var(--warning-2)'
+      : st === 'done' ? 'var(--success-2)' : 'var(--border-strong)';
+    const hasReply = state.replies.some(r => r.mentionId === m.id);
+    return `<article class="mention ${state.highlightId === m.id ? 'is-highlight' : ''} ${st === 'breached' ? 'sla-breached' : ''}"
+        data-id="${m.id}" data-sla-state="${st}" style="--sev:${sev}">
+      <div class="m-top">
+        <span class="m-source" style="--sc:${srcColor(m.source)}"><span class="src-dot"></span>${esc(srcLabel(m.source))}</span>
+        <span class="m-time">${esc(m.time)}</span>
+        <span class="sla-slot">${slaPill(m)}</span>
+        <span class="m-spacer"></span>
+        <span class="sent ${sentClass(m.sentiment)}">${sentMark(m.sentiment)} ${esc(sentLabel(m.sentiment))}</span>
+      </div>
+      <p class="m-text">${esc(L(m.text))}</p>
+      <div class="m-tags">
+        ${L(m.themes).map((th, i) => `<span class="tag t-${themeClass(m.themes.zh[i] || th)}">${esc(th)}</span>`).join('')}
+        ${hasReply && m.responded ? `<span class="tag t-praise">${esc(txt('sla.done'))}</span>` : ''}
+      </div>
+    </article>`;
+  }).join('');
+  refreshWaivers();
+}
+function themeClass(name) {
+  const s = String(name);
+  if (/價格|價|Price/.test(s)) return 'price';
+  if (/服務|態度|Service|Attitude/.test(s)) return 'service';
+  if (/數碼|小程序|Digital|會員|Loyalty/.test(s)) return 'digital';
+  if (/企業|業績|國際|擴張|Corporate|Expansion|ESG|僱主|Brand|品牌/.test(s)) return 'corporate';
+  if (/推薦|正面|Recommendation|Emotion|暖心/.test(s)) return 'praise';
+  if (/產品|湯底|味道|雲吞|新品|品質|食安|Product|Soup|Wonton|Food|Flavour|Quality|New/.test(s)) return 'product';
+  return 'service';
+}
+
+/* Live tick: update every SLA pill in place (no full re-render) */
+function tickClock() {
+  const t = new Date(state.now);
+  const clock = $('#foot-clock');
+  if (clock) clock.textContent = `${pad2(t.getHours())}:${pad2(t.getMinutes())}:${pad2(t.getSeconds())}`;
+}
+function refreshWaivers() {
+  const next = state.now;
+  $$('[data-sla-id]').forEach(el => {
+    const m = state.mentions.find(x => x.id === el.dataset.slaId);
+    if (!m) return;
+    const st = slaState(m);
+    if (el.dataset.renderState === st + ':' + Math.floor(slaRemaining(m) / 1000)) return;
+    const slot = el.closest('.sla-slot');
+    const card = el.closest('.mention');
+    const w = card && card.closest('#watch-list');
+    if (slot) {
+      el.outerHTML = slaPill(m);
+      slot.innerHTML = slaPill(m);
+      slot.firstElementChild.dataset.renderState = st + ':' + Math.floor(slaRemaining(m) / 1000);
+    }
+  });
+  // Watchlist pills
+  $$('#watch-list [data-sla-id]').forEach(el => {
+    const m = state.mentions.find(x => x.id === el.dataset.slaId);
+    if (!m) return;
+    const st = slaState(m), sec = Math.floor((slaRemaining(m) || 0) / 1000);
+    if (el.dataset.renderState === st + ':' + sec) return;
+    el.outerHTML = slaPill(m).replace('data-sla-id', 'data-sla-id');
+    const fresh = $('#watch-list [data-sla-id="' + m.id + '"]');
+    if (fresh) fresh.dataset.renderState = st + ':' + sec;
+  });
+  tickClock();
+  void next;
+}
+
+/* ---------- Themes ---------- */
+function renderThemes() {
+  $('#themes-container').innerHTML = THEMES.map(th => {
+    const fill = th.pct > 25 ? 'high' : th.pct > 10 ? 'med' : 'low';
+    const sLabel = txt('sent.' + (th.sentiment === 'mixed' ? 'neutral' : th.sentiment));
+    return `<div class="theme-row">
+      <div class="theme-name" title="${esc(L(th))}">${esc(L(th))}</div>
+      <div class="theme-track">
+        <div class="theme-fill ${fill}" style="width:${Math.max(th.pct, 12)}%">${esc(sLabel)}</div>
+      </div>
+      <div class="theme-pct"><b>${th.count}</b> · ${th.pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- Sentiment trend ---------- */
+function renderTrend() {
+  $('#sentiment-trend').innerHTML = TREND.map(d => {
+    const sum = d.pos + d.neu + d.neg;
+    return `<div class="trend-col" title="${esc(L(d))}: +${d.pos} / ~${d.neu} / -${d.neg}">
+      <div class="trend-stack">
+        <span class="tv-neg" style="height:${(d.neg / 120 * 100).toFixed(1)}%"></span>
+        <span class="tv-neu" style="height:${(d.neu / 120 * 100).toFixed(1)}%"></span>
+        <span class="tv-pos" style="height:${(d.pos / 120 * 100).toFixed(1)}%"></span>
+      </div>
+      <span class="trend-day">${esc(L(d))}</span>
+    </div>`;
+  }).join('');
+  $('#trend-key').innerHTML = `
+    <span><i style="background:var(--success-2)"></i>${esc(txt('trend.pos'))}</span>
+    <span><i style="background:var(--text-3)"></i>${esc(txt('trend.neu'))}</span>
+    <span><i style="background:var(--danger-2)"></i>${esc(txt('trend.neg'))}</span>
+    <span style="margin-inline-start:auto;font-family:var(--font-mono);font-size:11px">Σ ${TREND.reduce((a, d) => a + d.pos + d.neu + d.neg, 0)}</span>`;
+}
+
+/* ---------- Strategy ---------- */
+function renderStrategies() {
+  $('#strategy-container').innerHTML = STRATEGIES.map(s => `
+    <div class="strategy-item ${s.urgent ? 'urgent' : ''}">
+      <div class="strategy-head">
+        <span class="pill ${s.urgent ? 'p-urgent' : 'p-normal'}">${esc(txt(s.urgent ? 'strategy.urgent' : 'strategy.normal'))}</span>
+        <span class="strategy-title">${esc(L(s.title))}</span>
+      </div>
+      <p class="strategy-desc">${esc(L(s.desc))}</p>
+    </div>`).join('');
+}
+
+/* ---------- Replies ---------- */
+function getReplyFor(mentionId) {
+  return state.replies.find(r => r.mentionId === mentionId) || null;
+}
+function renderReplies() {
+  const box = $('#replies-container');
+  const order = { draft:0, approved:1, rejected:2, queued:3 };
+  const list = state.replies.filter(r => r.status !== 'queued')
+    .sort((a, b) => order[a.status] - order[b.status]);
+
+  if (!list.length) {
+    box.innerHTML = `<div class="empty"><strong>${esc(txt('reply.noDraftsTitle'))}</strong>${esc(txt('reply.noDraftsSub'))}</div>`;
+    return;
+  }
+  box.innerHTML = list.map(r => {
+    const m = state.mentions.find(x => x.id === r.mentionId);
+    const isDraft = r.status === 'draft';
+    // Pending drafts always follow the live brand-tone selection; approved/rejected
+    // cards keep the voice in which they were signed off.
+    const voice = isDraft ? state.tone : r.tone;
+    const bodyText = L(r.body[voice] || r.body[state.tone] || r.body.formal);
+    const toneCls = 't-' + voice;
+    const toneName = txt(voice === 'formal' ? 'tone.formal' : 'tone.friendly');
+    const toneEmoji = voice === 'formal' ? '🏛️' : '🤝';
+    const ctx = m ? `<div class="reply-context">
+        <span class="rc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
+        <span class="rc-quote"><b>${esc(txt('reply.ctxLabel'))}</b> · <q>${esc(L(m.text))}</q></span>
+      </div>` : '';
+    const sla = m ? slaPill(m) : '';
+    return `<div class="reply-card is-${r.status}" data-reply-id="${r.id}">
+      <div class="reply-head">
+        <div class="reply-target">
+          <span class="rt-src" style="--sc:${srcColor(r.source)}">${esc(srcLabel(r.source))}</span>
+          ${esc(L(r.target))}
+          <span class="rt-user">@${esc(L(m ? m.author : { zh:'', en:'' }))}</span>
+        </div>
+        <div class="reply-head-side">
+          ${sla}
+          <span class="tone-pill ${toneCls}">${toneEmoji} ${esc(toneName)}</span>
+          <span class="reply-status ${r.status}">${esc(txt('reply.' + r.status))}</span>
+        </div>
+      </div>
+      ${ctx}
+      <div class="reply-body-wrap">
+        <div class="reply-body" ${isDraft ? 'contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true" aria-label="' + esc(txt('reply.edit')) + '"' : ''}>${esc(bodyText)}</div>
+      </div>
+      <div class="reply-actions">
+        ${isDraft ? `
+          <button class="btn btn-approve" type="button" data-action="approve" data-id="${r.id}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>${esc(txt('reply.approve'))}
+          </button>
+          <button class="btn btn-reject" type="button" data-action="reject" data-id="${r.id}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M18 6L6 18M6 6l12 12"/></svg>${esc(txt('reply.reject'))}
+          </button>
+          <span class="reply-note">${esc(txt('reply.editHint'))}</span>
+        ` : r.status === 'rejected' ? `
+          <button class="btn btn-ghost btn-sm" type="button" data-action="resend" data-id="${r.id}">↺ ${esc(txt('reply.resend'))}</button>
+          <span class="reply-note">${esc(txt('reply.aiNote'))}</span>
+        ` : `<span class="reply-note">${esc(txt('reply.aiNote'))}</span>`}
+      </div>
+    </div>`;
+  }).join('');
+  // stamp render state for ticker skip-cache
+  $$('#replies-container .sla[data-sla-id]').forEach(el => {
+    const m = state.mentions.find(x => x.id === el.dataset.slaId);
+    if (m) el.dataset.renderState = slaState(m) + ':' + Math.floor((slaRemaining(m) || 0) / 1000);
+  });
+}
+
+/* ---------- Tone selector ---------- */
+function syncToneSelector(animate) {
+  const sel = $('#tone-selector');
+  if (!sel) return;
+  const btns = $$('.tone-btn', sel);
+  if (!btns.length) return;
+  btns.forEach(b => b.setAttribute('aria-checked', String(b.dataset.tone === state.tone)));
+
+  // Theme-independent state class (used by tests / fallbacks when the panel is hidden)
+  sel.dataset.tone = state.tone;
+
+  const thumb = $('#tone-thumb');
+  if (thumb) {
+    thumb.className = 'tone-thumb ' + (state.tone === 'formal' ? 't-formal' : 't-friendly');
+    if (animate) thumb.style.transition = 'transform .3s var(--ease),width .3s var(--ease),background .3s var(--ease)';
+  }
+
+  // Geometry only when the selector is actually laid out (hidden tabs measure 0)
+  const active = btns.find(b => b.dataset.tone === state.tone) || btns[0];
+  const r = active.getBoundingClientRect();
+  if (!thumb || !r.width) return;
+  const selRect = sel.getBoundingClientRect();
+  thumb.style.width = r.width + 'px';
+  thumb.style.transform = `translateX(${r.left - selRect.left - 4}px)`;
+}
+
+/* ---------- Watchlist ---------- */
+function renderWatchlist() {
+  const list = sortedMentions()
+    .filter(m => !m.responded && slaState(m) !== 'none' && slaState(m) !== 'done')
+    .slice(0, 4);
+  const box = $('#watch-list');
+  if (!list.length) {
+    box.innerHTML = `<div class="empty" style="padding:22px 12px">${esc(txt('sla.done'))} ✓</div>`;
+    return;
+  }
+  box.innerHTML = list.map(m => {
+    const st = slaState(m);
+    const sev = st === 'breached' || st === 'urgent' ? 'var(--danger-2)' : 'var(--warning-2)';
+    return `<button class="watch-item" type="button" data-jump="${m.id}" style="--sev:${sev}">
+      <span class="wi-bar"></span>
+      <span class="wi-main">
+        <span class="wi-src">${esc(srcLabel(m.source))} · ${esc(m.time)}</span>
+        <span class="wi-text">${esc(L(m.text))}</span>
+      </span>
+      ${slaPill(m)}
+    </button>`;
+  }).join('');
+  $$('#watch-list .sla[data-sla-id]').forEach(el => {
+    const m = state.mentions.find(x => x.id === el.dataset.slaId);
+    if (m) el.dataset.renderState = slaState(m) + ':' + Math.floor((slaRemaining(m) || 0) / 1000);
+  });
+}
+
+/* ---------- PRD notes / demo ---------- */
+function renderNotes() {
+  $('#note-list').innerHTML = NOTES.map((n, i) => `
+    <li class="${state.noteIndex === i ? 'active' : ''}">
+      <span class="note-sec">${esc(n.sec)}</span>
+      <span class="note-txt">${esc(n[state.lang])}</span>
+      <button class="note-show" type="button" data-note="${i}">${esc(txt('show'))}</button>
+    </li>`).join('');
+}
+function renderDemo() {
+  $('#demo-btns').innerHTML = DEMO.map(d => `<button class="demo-btn" type="button" data-demo="${d.action}">${esc(d[state.lang])}</button>`).join('');
+  const flash = $('#flash-msg');
+  flash.textContent = state.flash;
+  flash.classList.toggle('is-error', !!state.flashError);
+}
+
+/* ---------- Badges ---------- */
+function renderBadges() {
+  const negOpen = state.mentions.filter(m => m.sentiment === 'negative' && !m.responded).length;
+  const drafts = state.replies.filter(r => r.status === 'draft').length;
+  const lb = $('#listen-badge');
+  lb.textContent = negOpen;
+  lb.classList.toggle('is-alert', negOpen > 0);
+  const rb = $('#reply-badge');
+  rb.textContent = drafts;
+  rb.classList.toggle('is-alert', drafts > 0);
+  $('#listen-badge').closest('.tab-btn').setAttribute('aria-label', `${txt('tab.listen')} (${negOpen})`);
+  $$('.tab-btn').forEach(b => b.setAttribute('aria-selected', String(b.dataset.section === state.section)));
+  ['listen', 'themes', 'strategy', 'replies'].forEach(sec => {
+    const el = $('#sec-' + sec);
+    if (el) el.hidden = sec !== state.section;
+  });
+}
+
+/* ============================================================
+   PART 10 · ACTIONS
+   ============================================================ */
+function setFlash(msg, isError) {
+  state.flash = msg || '';
+  state.flashError = !!isError;
+  const flash = $('#flash-msg');
+  if (flash) {
+    flash.textContent = state.flash;
+    flash.classList.toggle('is-error', !!isError);
+  }
+}
+function switchSection(section) {
+  state.section = section;
+  state.noteIndex = -1;
+  renderBadges();
+  renderNotes();
+  if (section === 'replies') requestAnimationFrame(() => syncToneSelector(false));
+}
+function setSource(id) {
+  state.source = id;
+  renderFilterBar();
+  renderMentions();
+}
+function jumpToMention(id) {
+  const m = state.mentions.find(x => x.id === id);
+  if (!m) return;
+  state.section = 'listen';
+  // ensure the mention is reachable under current filter
+  if (state.source !== 'all' && state.source !== m.source) state.source = m.source;
+  state.highlightId = id;
+  render();
+  requestAnimationFrame(() => {
+    const card = $(`.mention[data-id="${id}"]`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => { state.highlightId = null; card.classList.remove('is-highlight'); }, 2600);
+    }
+  });
+}
+
+function setTone(tone, opts) {
+  const animate = !opts || opts.animate !== false;
+  if (tone !== 'formal' && tone !== 'friendly') return;
+  if (state.tone === tone) return;
+
+  const toneName = txt(tone === 'formal' ? 'tone.formal' : 'tone.friendly');
+  state.tone = tone;
+  savePrefs();
+
+  // Blur the just-clicked control so the re-rendered label change is never
+  // announced as a new name by a screen reader.
+  const focused = document.activeElement;
+  if (focused && focused.classList && focused.classList.contains('tone-btn')) {
+    focused.dataset.wasFocus = '1';
+    focused.blur();
+  }
+
+  const scrollY = (typeof window.scrollY === 'number' ? window.scrollY : 0) || 0;
+  const cards = $$('#replies-container .reply-card.is-draft .reply-body');
+  cards.forEach(c => c.classList.add('is-switching'));
+  syncToneSelector(false);
+
+  // Mark the draft list so CSS can animate the swap even before re-render
+  $$('#replies-container .reply-card.is-draft .tone-pill').forEach(p => {
+    p.className = 'tone-pill t-' + tone;
+    p.textContent = (tone === 'formal' ? '🏛️ ' : '🤝 ') + toneName;
+  });
+
+  const apply = () => {
+    try { renderReplies(); } catch (e) { /* keep UI usable if a card fails */ }
+    try { renderChrome(); } catch (e) {}
+    saveSnapshot();
+    // Preserve the reading position — swapping drafts must not scroll the page.
+    if (typeof window.scrollTo === 'function') {
+      try { window.scrollTo(0, scrollY); } catch (e) {}
+      requestAnimationFrame(() => { try { window.scrollTo(0, scrollY); } catch (e) {} });
+    }
+    syncToneSelector(false);
+    // Restore keyboard focus for a11y (no announcement on the button itself).
+    const back = $(`.tone-btn[data-tone="${tone}"]`);
+    if (back && back.dataset.wasFocus === '1') {
+      try { back.focus({ preventScroll: true }); } catch (e) {}
+      delete back.dataset.wasFocus;
+    }
+  };
+  if (animate) setTimeout(apply, 190); else apply();
+
+  setFlash(state.lang === 'zh'
+    ? `已切換至「${toneName}」，待審草稿已按新語調重寫`
+    : `Switched to "${toneName}" — pending drafts rewritten`);
+}
+
+function handleReplyAction(action, id) {
+  const r = state.replies.find(x => x.id === id);
+  if (!r) return;
+  const m = state.mentions.find(x => x.id === r.mentionId);
+  if (action === 'approve') {
+    r.tone = state.tone;          // freeze the voice that was actually signed off
+    r.status = 'approved';
+    if (m) m.responded = true;
+    setFlash(state.lang === 'zh'
+      ? `回覆已批准（${srcLabel(r.source)}）· 已標記 SLA 完成，待人工發布`
+      : `Reply approved (${srcLabel(r.source)}) · SLA marked complete, awaiting human publish`);
+  } else if (action === 'reject') {
+    r.status = 'rejected';
+    if (m) m.responded = false;
+    setFlash(state.lang === 'zh' ? '回覆已拒絕，已退回重寫隊列' : 'Reply rejected — returned to the rewrite queue');
+  } else if (action === 'resend') {
+    r.status = 'draft';
+    setFlash(state.lang === 'zh' ? '已重新加入待審隊列' : 'Re-queued for review');
+  }
+  render();
+  saveSnapshot();
+}
+
+function handleDemo(action) {
+  const msg = FLASH[action] ? FLASH[action][state.lang] : '';
+  if (action === 'new-mention') {
+    const id = 'n' + Date.now();
+    const fresh = {
+      id, source: 'red', time: 'now', createdAt: Date.now(),
+      sentiment: 'negative', priority: 'high', responded: false,
+      text: {
+        zh: '啱啱買咗譚仔外賣，返到屋企打開，湯全部灑晒喺袋度，包裝完全冇封好。好失望，希望改善包裝！',
+        en: 'Just bought Tam Jai takeaway — got home and the soup had spilled all over the bag, the packaging was not sealed at all. Really disappointed, please fix the packaging!'
+      },
+      themes: { zh: ['外賣包裝', '服務體驗'], en: ['Packaging', 'Service Experience'] },
+      author: { zh: '小紅書用戶 阿Kay', en: 'RED user Kay' },
+      replyTarget: { zh: '小紅書私信回覆', en: 'RED DM reply' }
+    };
+    state.mentions.unshift(fresh);
+    if (state.source !== 'all' && state.source !== 'red') state.source = 'all';
+    setFlash(msg);
+  } else if (action === 'refresh') {
+    const mk = (id, src, pr, sent, zh, en, tzh, ten, minAgo) => ({
+      id, source: src, time: 'now', createdAt: Date.now() - (minAgo || 0) * 60000,
+      sentiment: sent, priority: pr, responded: false,
+      text: { zh, en }, themes: { zh: tzh, en: ten },
+      author: { zh: '平台用戶', en: 'Platform user' },
+      replyTarget: null
+    });
+    state.mentions.push(
+      mk('n2', 'weibo', 'medium', 'negative',
+        '譚仔嘅分店愈開愈多，但係每次都要排隊排好耐，等位等到冇心機。',
+        'Tam Jai keeps opening branches but every visit means a long queue. Waiting so long you lose the mood.',
+        ['等位時間', '分店容量'], ['Queue Time', 'Branch Capacity'], 12),
+      mk('n3', 'red', 'low', 'positive',
+        '譚仔嘅米線湯底真係一絕，每次返香港第一餐一定係佢！',
+        'Tam Jai\'s noodle soup base is unbeatable — always my first meal back in Hong Kong!',
+        ['產品味道', '推薦'], ['Product Taste', 'Recommendation'], 5)
+    );
+    setFlash(msg);
+  } else if (action === 'batch-approve') {
+    const pend = state.replies.filter(r => r.status === 'draft');
+    if (!pend.length) { setFlash(state.lang === 'zh' ? '目前沒有待審草稿' : 'No pending drafts to approve', true); return; }
+    pend.forEach(r => {
+      r.tone = state.tone;
+      r.status = 'approved';
+      const m = state.mentions.find(x => x.id === r.mentionId);
+      if (m) m.responded = true;
+    });
+    setFlash(state.lang === 'zh' ? `已批量審批 ${pend.length} 條回覆草稿` : `${pend.length} drafts batch-approved`);
+  } else if (action === 'toggle-sentiment') {
+    const m = state.mentions[0];
+    if (m) m.sentiment = m.sentiment === 'negative' ? 'positive' : m.sentiment === 'positive' ? 'neutral' : 'negative';
+    setFlash(msg);
+  } else if (action === 'jump-peak') {
+    const peak = sortedMentions().find(m => m.sentiment === 'negative' && m.priority === 'high');
+    if (peak) { jumpToMention(peak.id); setFlash(msg); return; }
+    setFlash(state.lang === 'zh' ? '沒有高風險負面帖文' : 'No high-risk negative mentions', true);
+    return;
+  } else if (action === 'reset') {
+    resetState(true);
+    state.section = 'listen';
+  }
+  render();
+  saveSnapshot();
+}
+
+/* Inline body editing */
+function commitEdit(card) {
+  const body = $('.reply-body', card);
+  if (!body) return;
+  const r = state.replies.find(x => x.id === card.dataset.replyId);
+  if (!r) return;
+  const val = body.innerText.replace(/\u00a0/g, ' ').trim();
+  if (!val) { body.innerText = L(r.body[r.tone]); return; }
+  if (L(r.body[r.tone]).trim() === val) return;
+  r.body[r.tone] = { ...r.body[r.tone], [state.lang]: val };
+  r.edited = true;
+  setFlash(state.lang === 'zh' ? '草稿已更新並保存（人工修訂）' : 'Draft updated and saved (human revision)');
+  saveSnapshot();
+}
+
+/* ============================================================
+   PART 11 · EVENTS
+   ============================================================ */
+document.addEventListener('click', e => {
+  const tab = e.target.closest('.tab-btn');
+  if (tab) { switchSection(tab.dataset.section); return; }
+
+  const chip = e.target.closest('.filter-chip');
+  if (chip) { setSource(chip.dataset.source); return; }
+
+  const toneBtn = e.target.closest('.tone-btn');
+  if (toneBtn) { setTone(toneBtn.dataset.tone); return; }
+
+  const noteBtn = e.target.closest('.note-show');
+  if (noteBtn) {
+    const i = parseInt(noteBtn.dataset.note, 10);
+    state.noteIndex = i;
+    const target = NOTES[i].target || {};
+    state.section = target.section || 'listen';
+    if (target.focus === 'filter') state.source = 'all';
+    render();
+    if (target.focus && target.section === 'replies') {
+      requestAnimationFrame(() => {
+        const el = $('#tone-selector');
+        if (el) { el.scrollIntoView({ behavior:'smooth', block:'center' }); el.focus?.(); }
+      });
+    }
+    return;
+  }
+
+  const actionBtn = e.target.closest('[data-action]');
+  if (actionBtn) { handleReplyAction(actionBtn.dataset.action, actionBtn.dataset.id); return; }
+
+  const demoBtn = e.target.closest('.demo-btn');
+  if (demoBtn) {
+    $$('.demo-btn').forEach(b => b.setAttribute('aria-pressed', 'false'));
+    demoBtn.setAttribute('aria-pressed', 'true');
+    handleDemo(demoBtn.dataset.demo);
+    return;
+  }
+
+  const jumpBtn = e.target.closest('[data-jump]');
+  if (jumpBtn) { jumpToMention(jumpBtn.dataset.jump); return; }
+});
+
+/* Inline edit save */
+document.addEventListener('focusout', e => {
+  const body = e.target.closest && e.target.closest('.reply-body[contenteditable="true"]');
+  if (body) { const card = body.closest('.reply-card'); if (card) commitEdit(card); }
+});
+document.addEventListener('keydown', e => {
+  if (e.target.closest && e.target.closest('.reply-body[contenteditable="true"]')) {
+    if (e.key === 'Escape') { e.target.blur(); }
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); e.target.blur(); }
+    return;
+  }
+  if (e.key === 'Escape') {
+    const sel = document.querySelector('.mention.is-highlight');
+    if (sel) { state.highlightId = null; sel.classList.remove('is-highlight'); }
+  }
+});
+
+/* Language + theme */
+$('#lang-zh').addEventListener('click', () => setLang('zh'));
+$('#lang-en').addEventListener('click', () => setLang('en'));
+function setLang(l) {
+  if (l !== 'zh' && l !== 'en') return;
+  state.lang = l;
+  savePrefs();
+  render();
+  requestAnimationFrame(() => syncToneSelector(false));
+  setFlash('');
+}
+$('#theme-toggle').addEventListener('click', () => {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  savePrefs();
+  renderChrome();
+});
+
+/* Re-position tone thumb on resize */
+let rz;
+window.addEventListener('resize', () => {
+  clearTimeout(rz);
+  rz = setTimeout(() => syncToneSelector(false), 120);
+});
+
+/* Keyboard support for tone radiogroup */
+$('#tone-selector').addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    const next = state.tone === 'formal' ? 'friendly' : 'formal';
+    setTone(next);
+    const btn = $(`.tone-btn[data-tone="${next}"]`);
+    if (btn) btn.focus();
+  }
+});
+
+/* ============================================================
+   PART 12 · TIMERS + INIT
+   ============================================================ */
+function tick() {
+  state.now = Date.now();
+  tickClock();
+  refreshWaivers();
+  // Light-touch SLA re-rank: if a card crossed into breach, re-render the stream once
+  const crossed = state.mentions.some(m => m._lastState && m._lastState !== slaState(m) && slaState(m) === 'breached');
+  state.mentions.forEach(m => { m._lastState = slaState(m); });
+  if (crossed) { renderKpis(); renderMentions(); renderWatchlist(); renderBadges(); }
+  else {
+    // update KPI SLA number only (cheap)
+    const breached = state.mentions.filter(m => slaState(m) === 'breached').length;
+    const openU = state.mentions.filter(m => slaState(m) === 'urgent').length;
+    const openM = state.mentions.filter(m => slaState(m) === 'moderate').length;
+    const el = $('#stat-sla');
+    if (el) {
+      el.textContent = breached ? breached : openU + openM;
+      el.style.color = breached || openU ? 'var(--danger)' : 'var(--warning)';
+    }
+  }
+}
+
+function init() {
+  loadPrefs();
+  loadSnapshot();
+  state.mentions.forEach(m => { m._lastState = slaState(m); });
+  setFlash('');
+  render();
+  requestAnimationFrame(() => syncToneSelector(false));
+  setInterval(tick, 1000);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => syncToneSelector(false));
+}
+
+init();
+})();
+</script>
+</body>
+</html>
